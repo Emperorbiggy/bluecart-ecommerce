@@ -1,11 +1,11 @@
 // resources/js/Layouts/AppLayout.jsx
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 export default function AppLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden">
       <Header />
 
       {/* Allow full-width children like hero/banner */}
@@ -13,5 +13,5 @@ export default function AppLayout({ children }) {
 
       <Footer />
     </div>
-  );
+  )
 }
