@@ -95,35 +95,43 @@ export default function Products() {
         </div>
 
         {/* Product Display */}
-        {getFilteredProducts().map(([category, items]) => (
-          <div key={category} className="mb-12">
-            <h2 className="text-2xl font-semibold capitalize text-gray-800 mb-6">
-              {category.replace('_', ' ')}
-            </h2>
+{getFilteredProducts().map(([category, items]) => (
+  <div key={category} className="mb-12">
+    <h2 className="text-2xl font-semibold capitalize text-gray-800 mb-6">
+      {category.replace('_', ' ')}
+    </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {items.map((product) => (
-                <div key={product.id} className="relative group overflow-hidden bg-white shadow-md rounded-lg transition hover:shadow-xl">
-                  {/* Clickable Link */}
-                  <Link href={`/products/${product.id}`} className="block">
-                    <img src={product.image} alt={product.name} className="w-full h-52 object-cover" />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
-                      <p className="text-[#130447] font-bold mt-2">₦{product.price.toLocaleString()}</p>
-                    </div>
-                  </Link>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-[#130447]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button className="px-4 py-2 bg-white text-[#130447] rounded-md font-medium hover:bg-gray-100 shadow">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {items.map((product) => (
+        <div key={product.id} className="relative group overflow-hidden bg-white shadow-md rounded-lg transition hover:shadow-xl">
+          <Link href={`/products/${product.id}`} className="block">
+            <img src={product.image} alt={product.name} className="w-full h-52 object-cover" />
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+              <p className="text-[#130447] font-bold mt-2">₦{product.price.toLocaleString()}</p>
             </div>
+          </Link>
+
+          <div className="absolute inset-0 bg-[#130447]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button className="px-4 py-2 bg-white text-[#130447] rounded-md font-medium hover:bg-gray-100 shadow">
+              Add to Cart
+            </button>
           </div>
-        ))}
+        </div>
+      ))}
+    </div>
+
+    {/* View More Button */}
+    <div className="mt-6 text-center">
+      <Link
+        href={`/category/${category}`}
+        className="inline-block px-5 py-2 rounded-full text-white bg-[#130447] hover:bg-[#100338] transition font-medium"
+      >
+        View More
+      </Link>
+    </div>
+  </div>
+))}
       </div>
     </AppLayout>
   )
