@@ -1,40 +1,46 @@
 import { Link } from '@inertiajs/react'
 import AppLayout from '@/Layouts/AppLayout'
 import { useEffect, useState } from 'react'
+import { ShoppingBag, Shirt, Headphones } from 'lucide-react';
 
 // Sample product data
 const products = {
   branded: [
-    { id: 1, name: 'Body Massager', price: 9500, image: 'https://via.placeholder.com/300x300?text=Massager' },
-    { id: 2, name: 'Running Shoes', price: 15000, image: 'https://via.placeholder.com/300x300?text=Shoes' },
-    { id: 3, name: 'Perfume Spray', price: 4500, image: 'https://via.placeholder.com/300x300?text=Perfume' },
+    { id: 1, name: 'Laptops', price: 9500, image: 'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 2, name: 'Running Shoes', price: 15000, image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 3, name: 'Perfume Spray', price: 4500, image: 'https://images.unsplash.com/photo-1699723018826-f77ad1d78f28?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
   ],
   clothing: [
-    { id: 4, name: 'Men’s Shirt', price: 7000, image: 'https://via.placeholder.com/300x300?text=Shirt' },
-    { id: 5, name: 'Women’s Dress', price: 11000, image: 'https://via.placeholder.com/300x300?text=Dress' },
+    { id: 4, name: 'Men’s Shirt', price: 7000, image: 'https://images.unsplash.com/photo-1602810320073-1230c46d89d4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 5, name: 'Women’s Dress', price: 11000, image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
   ],
   gadgets: [
-    { id: 6, name: 'Wireless Earbuds', price: 22000, image: 'https://via.placeholder.com/300x300?text=Earbuds' },
-    { id: 7, name: 'Bluetooth Speaker', price: 18000, image: 'https://via.placeholder.com/300x300?text=Speaker' },
+    { id: 6, name: 'Wireless Earbuds', price: 22000, image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 7, name: 'Bluetooth Speaker', price: 18000, image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
   ],
 }
+const categoryIcons = {
+  branded: ShoppingBag,
+  clothing: Shirt,
+  gadgets: Headphones,
+};
 
 // Slider content
 const heroSlides = [
   {
     title: 'Discover Endless Style',
     description: 'Shop curated selections of fashion, gadgets, and accessories. Best prices. Fast delivery. Quality you trust.',
-    image: 'https://via.placeholder.com/1600x600?text=Fashion+Deals',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     title: 'Tech Gadgets & Accessories',
     description: 'Explore our range of cutting-edge gadgets at unbeatable prices.',
-    image: 'https://via.placeholder.com/1600x600?text=Gadgets+Sale',
+    image: 'https://images.unsplash.com/photo-1483181957632-8bda974cbc91?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     title: 'Stay Trendy, Stay Cool',
     description: 'Browse the latest fashion pieces tailored for you.',
-    image: 'https://via.placeholder.com/1600x600?text=New+Arrivals',
+    image: 'https://images.unsplash.com/photo-1487744480471-9ca1bca6fb7d?q=80&w=2091&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
 ]
 
@@ -110,7 +116,7 @@ export default function Home() {
               Shop All Deals
             </Link>
             <img
-              src="https://via.placeholder.com/160x160?text=30%25+OFF"
+              src="https://images.unsplash.com/photo-1532795986-dbef1643a596?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="30% OFF"
               className="absolute right-6 bottom-4 w-32 md:w-40"
             />
@@ -119,7 +125,7 @@ export default function Home() {
           {/* Deal Product */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-sm w-full mx-auto">
             <img
-              src="https://via.placeholder.com/400x300?text=Smart+Watch+Series+X"
+              src="https://images.unsplash.com/photo-1613177794106-be20802b11d3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Smart Watch"
               className="w-full h-60 object-cover"
             />

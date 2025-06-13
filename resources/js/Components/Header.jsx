@@ -24,9 +24,12 @@ export default function Header() {
       {/* Main Navbar */}
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-osunblue tracking-wide">
-            Blue<span className="text-osunblue-700">Cart</span>
+          {/* Logo with Icon */}
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-osunblue tracking-wide">
+            <ShoppingCart className="w-6 h-6 text-osunblue-700" />
+            <span>
+              Blue<span className="text-osunblue-700">Cart</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -38,7 +41,7 @@ export default function Header() {
             <Link href="/contact" className="hover:text-osunblue transition">Contact</Link>
           </nav>
 
-          {/* Icons & Mobile Menu Toggle */}
+          {/* Icons & Mobile Toggle */}
           <div className="flex items-center gap-4">
             {/* Cart */}
             <Link href="/cart" className="relative text-gray-600 hover:text-osunblue transition">
@@ -51,7 +54,7 @@ export default function Header() {
               <span className="text-sm hidden md:inline">My Account</span>
             </Link>
 
-            {/* Mobile Toggle */}
+            {/* Mobile Menu Toggle */}
             <button onClick={toggleMobileMenu} className="md:hidden text-osunblue focus:outline-none">
               {isMobileNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
