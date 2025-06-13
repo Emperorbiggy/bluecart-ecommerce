@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import AppLayout from '../Layouts/AppLayout'
 import {
   User,
   ShoppingCart,
   CreditCard,
   PackageCheck,
-  LogOut,
-  Lock
+  LogOut
 } from 'lucide-react'
 
 export default function UserDashboard() {
@@ -126,7 +126,7 @@ export default function UserDashboard() {
         )
 
       case 'logout':
-        return <p className="text-red-600">You have been logged out.</p>
+        return <p className="text-red-600 font-semibold">You have been logged out.</p>
 
       default:
         return null
@@ -134,44 +134,38 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      {/* Header */}
-      <header className="bg-[#130447] text-white p-4 text-lg font-semibold">BlueCart User Dashboard</header>
-
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 bg-gray-100 p-4 border-r">
-          <div className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-[#130447] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
-              A
+    <AppLayout>
+      <div className="py-10 px-4 flex justify-center">
+        <div className="w-full max-w-6xl flex bg-white rounded-lg shadow-md overflow-hidden">
+          {/* Sidebar */}
+          <aside className="w-64 bg-gray-100 p-4 border-r">
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#130447] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
+                A
+              </div>
+              <nav className="space-y-2 w-full">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`flex items-center gap-2 px-4 py-2 w-full text-sm font-medium rounded-md transition ${
+                      activeTab === tab.key
+                        ? 'bg-[#130447] text-white'
+                        : 'hover:bg-gray-200'
+                    }`}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
             </div>
-            <nav className="space-y-2 w-full">
-              {tabs.map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 px-4 py-2 w-full text-sm font-medium rounded-md transition ${
-                    activeTab === tab.key
-                      ? 'bg-[#130447] text-white'
-                      : 'hover:bg-gray-200'
-                  }`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </aside>
+          </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-white">{renderContent()}</main>
+          {/* Main Content */}
+          <main className="flex-1 p-8">{renderContent()}</main>
+        </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-100 text-center text-sm text-gray-500 p-4">
-        &copy; {new Date().getFullYear()} BlueCart. All rights reserved.
-      </footer>
-    </div>
+    </AppLayout>
   )
 }
