@@ -1,9 +1,14 @@
 import { Link } from '@inertiajs/react';
-import { ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Header() {
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  const toggleMobileMenu = () => setIsMobileNavOpen(!isMobileNavOpen);
+
   return (
-    <header className="w-full shadow-sm z-50">
+    <header className="w-full shadow-sm z-50 relative bg-white">
       {/* Top Contact Bar */}
       <div className="bg-osunblue text-white text-sm py-2 px-4 flex justify-between items-center">
         <div className="flex gap-4 items-center">
@@ -24,7 +29,7 @@ export default function Header() {
             Blue<span className="text-osunblue-700">Cart</span>
           </Link>
 
-          {/* Nav Links */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-6 text-gray-700 font-medium">
             <Link href="/" className="hover:text-osunblue transition">Home</Link>
             <Link href="/products" className="hover:text-osunblue transition">Products</Link>
@@ -33,13 +38,11 @@ export default function Header() {
             <Link href="/contact" className="hover:text-osunblue transition">Contact</Link>
           </nav>
 
-          {/* Icons */}
-          <div className="flex gap-6 items-center">
+          {/* Icons & Mobile Menu Toggle */}
+          <div className="flex items-center gap-4">
             {/* Cart */}
             <Link href="/cart" className="relative text-gray-600 hover:text-osunblue transition">
               <ShoppingCart className="w-5 h-5" />
-              {/* Optional: Add badge */}
-              {/* <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span> */}
             </Link>
 
             {/* Account */}
@@ -47,18 +50,25 @@ export default function Header() {
               <User className="w-5 h-5" />
               <span className="text-sm hidden md:inline">My Account</span>
             </Link>
+
+            {/* Mobile Toggle */}
+            <button onClick={toggleMobileMenu} className="md:hidden text-osunblue focus:outline-none">
+              {isMobileNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-
-        {/* Mobile Nav (Optional if you're supporting small screens) */}
-        <div className="md:hidden border-t px-4 py-2 bg-white text-sm text-gray-600 flex justify-between">
-          <Link href="/" className="hover:text-osunblue">Home</Link>
-          <Link href="/products" className="hover:text-osunblue">Products</Link>
-          <Link href="/categories" className="hover:text-osunblue">Categories</Link>
-          <Link href="/about" className="hover:text-osunblue">About</Link>
-          <Link href="/contact" className="hover:text-osunblue">Contact</Link>
-        </div>
       </div>
+
+      {/* Mobile Nav */}
+      {isMobileNavOpen && (
+        <div className="md:hidden bg-white border-t px-4 py-4 space-y-3 text-gray-700 font-medium shadow">
+          <Link href="/" className="block hover:text-osunblue">Home</Link>
+          <Link href="/products" className="block hover:text-osunblue">Products</Link>
+          <Link href="/categories" className="block hover:text-osunblue">Categories</Link>
+          <Link href="/about" className="block hover:text-osunblue">About Us</Link>
+          <Link href="/contact" className="block hover:text-osunblue">Contact</Link>
+        </div>
+      )}
     </header>
   );
 }
