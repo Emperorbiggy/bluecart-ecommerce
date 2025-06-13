@@ -177,25 +177,30 @@ export default function Home() {
 
       {/* Featured Categories */}
       <section className="max-w-7xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Featured Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {Object.keys(products).map((category) => {
-            const Icon = categoryIcons[category] || ShoppingBag
-            return (
-              <Link
-                key={category}
-                href={`/category/${category}`}
-                className="flex flex-col items-center justify-center bg-white rounded-lg shadow p-6 hover:shadow-md transition text-center group"
-              >
-                <div className="bg-osunblue/10 p-4 rounded-full mb-3 group-hover:bg-osunblue/20 transition">
-                  <Icon className="w-8 h-8 text-osunblue" />
-                </div>
-                <span className="text-osunblue font-semibold capitalize">{category.replace(/_/g, ' ')}</span>
-              </Link>
-            )
-          })}
-        </div>
-      </section>
+  <h2 className="text-2xl font-bold text-[#130447] mb-6">Featured Categories</h2>
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+    {Object.keys(products).map((category) => {
+      const Icon = categoryIcons[category] || ShoppingBag;
+      return (
+        <Link
+          key={category}
+          href={`/category/${category}`}
+          className="group rounded-xl bg-white p-6 shadow transition-all hover:shadow-xl transform hover:-translate-y-1 border border-transparent hover:border-osunblue"
+        >
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-osunblue/10 p-4 rounded-full mb-4 group-hover:bg-osunblue transition-all duration-300">
+              <Icon className="w-8 h-8 text-osunblue group-hover:text-white transition" />
+            </div>
+            <span className="text-sm font-semibold text-osunblue group-hover:text-osunblue-700 capitalize transition">
+              {category.replace(/_/g, ' ')}
+            </span>
+          </div>
+        </Link>
+      );
+    })}
+  </div>
+</section>
+
 
       {/* Product Categories */}
       <div className="max-w-7xl mx-auto py-16 px-4 space-y-20">
