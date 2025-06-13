@@ -36,6 +36,15 @@ Route::get('/admin/dashboard', function () {
 Route::get('/admin/products', function () {
     return Inertia::render('AllProducts');
 });
+Route::get('/admin/create/product', function () {
+    return Inertia::render('AddProduct');
+});
+Route::get('/admin/orders', function () {
+    return Inertia::render('Orders');
+});
+Route::get('/admin/profile', function () {
+    return Inertia::render('AdminProfilePage');
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');
