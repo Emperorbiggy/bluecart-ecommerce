@@ -1,15 +1,30 @@
-import { Link } from '@inertiajs/react';
+import { Link, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 export default function Login() {
-  const [form, setForm] = useState({
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = () => setShowPassword(!showPassword);
+
+  const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePassword = () => setShowPassword(!showPassword);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    post(route('login'), {
+      onSuccess: (page) => {
+        const role = page.props?.auth?.user?.role;
+        if (role === 'admin') {
+          router.visit('/admin/dashboard');
+        } else {
+          router.visit('/dashboard');
+        }
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
@@ -24,7 +39,9 @@ export default function Login() {
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-center p-10">
           <div>
             <h2 className="text-white text-4xl font-bold mb-4">Welcome Back</h2>
-            <p className="text-white text-lg">Log in to access exclusive deals and manage your account.</p>
+            <p className="text-white text-lg">
+              Log in to access exclusive deals and manage your account.
+            </p>
           </div>
         </div>
       </div>
@@ -34,17 +51,20 @@ export default function Login() {
         <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl w-full max-w-md p-8 border border-blue-100">
           <h2 className="text-3xl font-bold text-osunblue mb-6 text-center">Log In</h2>
 
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="relative">
               <Mail className="absolute left-3 top-3.5 text-gray-400" size={20} />
               <input
                 type="email"
                 placeholder="Email Address"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                value={data.email}
+                onChange={(e) => setData('email', e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none bg-white"
               />
+              {errors.email && (
+                <div className="text-red-500 text-sm mt-1">{errors.email}</div>
+              )}
             </div>
 
             {/* Password */}
@@ -53,8 +73,8 @@ export default function Login() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                value={data.password}
+                onChange={(e) => setData('password', e.target.value)}
                 className="w-full pl-10 pr-10 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none bg-white"
               />
               <span
@@ -63,6 +83,9 @@ export default function Login() {
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </span>
+              {errors.password && (
+                <div className="text-red-500 text-sm mt-1">{errors.password}</div>
+              )}
             </div>
 
             {/* Forgot Password */}
@@ -72,14 +95,17 @@ export default function Login() {
               </Link>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
+              disabled={processing}
               className="w-full bg-osunblue text-white py-3 rounded-lg hover:bg-osunblue-700 transition font-semibold"
             >
-              Log In
+              {processing ? 'Logging in...' : 'Log In'}
             </button>
           </form>
 
+          {/* Register Link */}
           <p className="text-center text-sm text-gray-600 mt-6">
             Don’t have an account?{' '}
             <Link href="/register" className="text-osunblue hover:underline font-medium">

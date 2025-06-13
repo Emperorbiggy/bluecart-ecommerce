@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,20 +32,26 @@ Route::get('/about', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('UserDashboard');
 });
-Route::get('/admin/dashboard', function () {
-    return Inertia::render('AdminDashboard');
-});
-Route::get('/admin/products', function () {
-    return Inertia::render('AllProducts');
-});
-Route::get('/admin/create/product', function () {
-    return Inertia::render('AddProduct');
-});
-Route::get('/admin/orders', function () {
-    return Inertia::render('Orders');
-});
-Route::get('/admin/profile', function () {
-    return Inertia::render('AdminProfilePage');
+Route::middleware(['auth', 'isadmin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Admin/Dashboard');
+    })->name('admin.dashboard');
+
+    Route::get('/products', function () {
+        return Inertia::render('AllProducts');
+    });
+
+    Route::get('/create/product', function () {
+        return Inertia::render('AddProduct');
+    });
+
+    Route::get('/orders', function () {
+        return Inertia::render('Orders');
+    });
+
+    Route::get('/profile', function () {
+        return Inertia::render('AdminProfilePage');
+    });
 });
 
 Route::get('/cart', function () {
@@ -59,10 +67,12 @@ Route::get('/', fn () => Inertia::render('Welcome'));
 //     return Inertia::render('Dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 require __DIR__.'/auth.php';

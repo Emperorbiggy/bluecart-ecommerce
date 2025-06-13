@@ -7,6 +7,7 @@ export default function AddProduct() {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
+    category: '', // ✅ Added
     shortDescription: '',
     details: '',
     discount: '',
@@ -73,6 +74,7 @@ export default function AddProduct() {
     setFormData({
       name: '',
       price: '',
+      category: '',
       shortDescription: '',
       details: '',
       discount: '',
@@ -126,6 +128,27 @@ export default function AddProduct() {
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Enter price"
             />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block font-medium mb-1" htmlFor="category">
+              Product Category
+            </label>
+            <select
+              name="category"
+              id="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
+            >
+              <option value="" disabled>Select a category</option>
+              <option value="Branded">Branded</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Gadgets">Gadgets</option>
+              <option value="Home Appliances">Home Appliances</option>
+            </select>
           </div>
 
           {/* Discount */}
