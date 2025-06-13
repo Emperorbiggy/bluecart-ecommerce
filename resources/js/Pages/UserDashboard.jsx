@@ -10,18 +10,18 @@ import {
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
+  const [name, setName] = useState('Ayodeji Samuel Ajayi')
+  const [email, setEmail] = useState('Rifelinktechnology@gmail.com')
   const [billingAddress, setBillingAddress] = useState('123 Blue Street, Ikeja, Lagos')
-  const [editAddress, setEditAddress] = useState(false)
-  const [newAddress, setNewAddress] = useState(billingAddress)
 
   const unpaidCartItems = [
-    { id: 1, name: 'Bluetooth Headphones', price: 25000 },
-    { id: 2, name: 'Smartwatch', price: 45000 }
+    { id: 1, name: 'Bluetooth Headphones', price: 25000, image: 'https://images.unsplash.com/photo-1580894747380-7bd6a27f479b?q=80&w=200&auto=format&fit=crop' },
+    { id: 2, name: 'Smartwatch', price: 45000, image: 'https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?q=80&w=200&auto=format&fit=crop' }
   ]
 
   const orders = [
-    { id: 1, name: 'Wireless Earbuds', price: 22000 },
-    { id: 2, name: 'Bluetooth Speaker', price: 18000 }
+    { id: 1, name: 'Wireless Earbuds', price: 22000, image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=200&auto=format&fit=crop' },
+    { id: 2, name: 'Bluetooth Speaker', price: 18000, image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=200&auto=format&fit=crop' }
   ]
 
   const tabs = [
@@ -36,20 +36,41 @@ export default function UserDashboard() {
     switch (activeTab) {
       case 'profile':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-[#130447]">Your Profile</h2>
-            <div className="mb-8 space-y-2">
-              <p><strong>Name:</strong> Ayodeji Samuel Ajayi</p>
-              <p><strong>Email:</strong> Rifelinktechnology@gmail.com</p>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#130447]">Your Profile</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-medium text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                />
+              </div>
+              <div>
+                <label className="block font-medium text-gray-700">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                />
+              </div>
+              <button className="bg-[#130447] text-white px-4 py-2 rounded-md hover:bg-[#0f0334]">
+                Update Profile
+              </button>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-md shadow-sm">
-              <h3 className="text-lg font-semibold mb-4 text-[#130447]">Change Password</h3>
+              <h3 className="text-lg font-semibold text-[#130447] mb-4">Change Password</h3>
               <div className="space-y-4">
                 <input type="password" placeholder="Old Password" className="w-full border px-4 py-2 rounded-md" />
                 <input type="password" placeholder="New Password" className="w-full border px-4 py-2 rounded-md" />
                 <input type="password" placeholder="Confirm New Password" className="w-full border px-4 py-2 rounded-md" />
-                <button className="bg-[#130447] text-white px-4 py-2 rounded-md hover:bg-[#0f0334]">Update Password</button>
+                <button className="bg-[#130447] text-white px-4 py-2 rounded-md hover:bg-[#0f0334]">
+                  Update Password
+                </button>
               </div>
             </div>
           </div>
@@ -57,71 +78,60 @@ export default function UserDashboard() {
 
       case 'cart':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-[#130447]">Your Cart</h2>
-            {unpaidCartItems.map(item => (
-              <div key={item.id} className="border-b py-3 flex justify-between">
-                <span>{item.name}</span>
-                <span>₦{item.price.toLocaleString()}</span>
-              </div>
-            ))}
-            <button className="mt-6 bg-[#130447] text-white px-4 py-2 rounded-md hover:bg-[#0f0334]">Proceed to Checkout</button>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#130447]">Your Cart</h2>
+            <div className="space-y-4">
+              {unpaidCartItems.map(item => (
+                <div key={item.id} className="flex items-center border rounded-md p-4">
+                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                  <div className="ml-4 flex-1">
+                    <p className="font-semibold">{item.name}</p>
+                    <p className="text-gray-500">₦{item.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="pt-4 border-t">
+              <button className="bg-[#130447] text-white px-6 py-2 rounded-md hover:bg-[#0f0334]">
+                Proceed to Checkout
+              </button>
+            </div>
           </div>
         )
 
       case 'billing':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-[#130447]">Billing Address</h2>
-            {editAddress ? (
-              <>
-                <textarea
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                  className="w-full border rounded-md p-3"
-                />
-                <div className="mt-4 space-x-2">
-                  <button
-                    className="bg-[#130447] text-white px-4 py-2 rounded-md"
-                    onClick={() => {
-                      setBillingAddress(newAddress)
-                      setEditAddress(false)
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
-                    onClick={() => setEditAddress(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="mb-4">{billingAddress}</p>
-                <button
-                  className="bg-[#130447] text-white px-4 py-2 rounded-md"
-                  onClick={() => setEditAddress(true)}
-                >
-                  Update Address
-                </button>
-              </>
-            )}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#130447]">Billing Address</h2>
+            <div>
+              <textarea
+                value={billingAddress}
+                onChange={(e) => setBillingAddress(e.target.value)}
+                className="w-full border rounded-md p-3"
+                rows={3}
+              />
+            </div>
+            <button className="bg-[#130447] text-white px-4 py-2 rounded-md hover:bg-[#0f0334]">
+              Update Address
+            </button>
           </div>
         )
 
       case 'orders':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-[#130447]">Order History</h2>
-            {orders.map(order => (
-              <div key={order.id} className="border-b py-3 flex justify-between">
-                <span>{order.name}</span>
-                <span>₦{order.price.toLocaleString()}</span>
-              </div>
-            ))}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#130447]">Order History</h2>
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div key={order.id} className="flex items-center border rounded-md p-4">
+                  <img src={order.image} alt={order.name} className="w-16 h-16 object-cover rounded" />
+                  <div className="ml-4 flex-1">
+                    <p className="font-semibold">{order.name}</p>
+                  </div>
+                  <p className="font-bold text-[#130447]">₦{order.price.toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )
 
@@ -136,34 +146,36 @@ export default function UserDashboard() {
   return (
     <AppLayout>
       <div className="py-10 px-4 flex justify-center">
-        <div className="w-full max-w-6xl flex bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="w-full max-w-5xl flex bg-white rounded-lg shadow-md overflow-hidden">
           {/* Sidebar */}
           <aside className="w-64 bg-gray-100 p-4 border-r">
-            <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-[#130447] text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
-                A
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-20 h-20 bg-[#130447] text-white rounded-full flex items-center justify-center text-xl font-bold mb-2">
+                {name.charAt(0)}
               </div>
-              <nav className="space-y-2 w-full">
-                {tabs.map(tab => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-2 px-4 py-2 w-full text-sm font-medium rounded-md transition ${
-                      activeTab === tab.key
-                        ? 'bg-[#130447] text-white'
-                        : 'hover:bg-gray-200'
-                    }`}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                  </button>
-                ))}
-              </nav>
+              <p className="font-semibold text-center">{name}</p>
             </div>
+
+            <nav className="space-y-2">
+              {tabs.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-2 px-4 py-2 w-full text-sm font-medium rounded-md transition ${
+                    activeTab === tab.key
+                      ? 'bg-[#130447] text-white'
+                      : 'hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 p-8">{renderContent()}</main>
+          <main className="flex-1 p-8 overflow-auto">{renderContent()}</main>
         </div>
       </div>
     </AppLayout>
