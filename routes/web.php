@@ -30,6 +30,9 @@ Route::get('/about', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('UserDashboard');
 });
+Route::get('/admin/dashboard', function () {
+    return Inertia::render('AdminDashboard');
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');
