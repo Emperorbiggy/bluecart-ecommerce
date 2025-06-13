@@ -17,6 +17,9 @@ use Inertia\Inertia;
 Route::get('/products/{id}', function ($id) {
     return Inertia::render('ProductDetails');
 });
+Route::get('/products', function () {
+    return Inertia::render('Products');
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');

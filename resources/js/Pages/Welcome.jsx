@@ -63,8 +63,12 @@ const heroSlides = [
 
 function ProductCard({ product }) {
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden w-60 shrink-0">
-      <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+    <div className="relative bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden w-60 shrink-0 group">
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+      />
       <div className="p-4">
         <h4 className="font-semibold text-sm mb-1 truncate">{product.name}</h4>
         <p className="text-osunblue font-bold text-sm">₦{product.price.toLocaleString()}</p>
@@ -75,9 +79,17 @@ function ProductCard({ product }) {
           View Details
         </Link>
       </div>
+
+      {/* Overlay on hover */}
+      <div className="absolute inset-0 bg-osunblue/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
+        <button className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-white/30">
+          Add to Cart
+        </button>
+      </div>
     </div>
   )
 }
+
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
