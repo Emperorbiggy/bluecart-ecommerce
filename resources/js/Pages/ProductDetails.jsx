@@ -1,90 +1,129 @@
-import { Link, usePage } from '@inertiajs/react';
+import React, { useState } from 'react'
+import { Link } from '@inertiajs/react'
+import AppLayout from '../Layouts/AppLayout'
 
-export default function ProductDetails() {
-  // Simulate props from Laravel backend
-  const product = {
-    id: 1,
-    name: 'Smart Watch Series X',
-    price: 21000,
-    oldPrice: 30000,
-    description: `Stay connected and stylish with the Smart Watch Series X. Track your health, receive notifications, and enjoy seamless pairing with your smartphone.`,
-    image: 'https://via.placeholder.com/500x500?text=Smart+Watch',
-    gallery: [
-      'https://via.placeholder.com/120x120?text=View+1',
-      'https://via.placeholder.com/120x120?text=View+2',
-      'https://via.placeholder.com/120x120?text=View+3',
-    ],
-  };
+const sampleProduct = {
+  id: 1,
+  name: 'Wireless Earbuds',
+  price: 22000,
+  images: [
+    'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1606813902291-ffd6ae2de1f6?q=80&w=1974&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1611186871348-bdb3e516bd7e?q=80&w=1974&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1598550487035-f5a5be1f19f2?q=80&w=1974&auto=format&fit=crop',
+  ],
+  description:
+    'Experience pure audio freedom with our premium Wireless Earbuds. Featuring top-tier noise cancellation, crystal-clear sound, and a sleek, ergonomic fit — perfect for music lovers and remote professionals alike.',
+}
 
-  const related = [
-    {
-      id: 2,
-      name: 'Wireless Earbuds',
-      price: 15000,
-      image: 'https://via.placeholder.com/300x300?text=Earbuds',
-    },
-    {
-      id: 3,
-      name: 'Fitness Tracker',
-      price: 13000,
-      image: 'https://via.placeholder.com/300x300?text=Tracker',
-    },
-  ];
+const relatedProducts = [
+  {
+    id: 2,
+    name: 'Bluetooth Speaker',
+    price: 18000,
+    image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=1974&auto=format&fit=crop',
+  },
+  {
+    id: 3,
+    name: 'Headphones',
+    price: 32000,
+    image: 'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=2070&auto=format&fit=crop',
+  },
+  {
+    id: 4,
+    name: 'Power Bank',
+    price: 15000,
+    image: 'https://images.unsplash.com/photo-1745889763766-037ad5b456e2?q=80&w=1936&auto=format&fit=crop',
+  },
+]
+
+export default function ProductDetail() {
+  const [mainImage, setMainImage] = useState(sampleProduct.images[0])
+  const [fadeIn, setFadeIn] = useState(true)
+
+  const changeImage = (img) => {
+    setFadeIn(false)
+    setTimeout(() => {
+      setMainImage(img)
+      setFadeIn(true)
+    }, 100)
+  }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 py-4 text-sm text-gray-500">
-        <Link href="/" className="hover:underline text-osunblue">Home</Link> &gt; <span>Product Details</span>
-      </div>
+    <AppLayout>
+      {/* Product Details Card */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Image Gallery */}
+          <div className="p-6">
+            <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+              <img
+                src={mainImage}
+                alt="Main Product"
+                className="w-full h-[450px] object-cover rounded-xl shadow-md"
+              />
+            </div>
 
-      {/* Product Info */}
-      <div className="max-w-7xl mx-auto px-4 py-10 grid md:grid-cols-2 gap-12 items-start">
-        {/* Image and Gallery */}
-        <div>
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-auto rounded-lg shadow"
-          />
-          <div className="flex gap-4 mt-4">
-            {product.gallery.map((img, i) => (
-              <img key={i} src={img} alt={`Gallery ${i}`} className="w-20 h-20 rounded border cursor-pointer" />
-            ))}
+            {/* Thumbnails */}
+            <div className="flex gap-4 mt-6 flex-wrap">
+              {sampleProduct.images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  onClick={() => changeImage(img)}
+                  alt={`Thumb ${index + 1}`}
+                  className={`w-24 h-24 object-cover rounded-lg border-2 cursor-pointer transition duration-300 transform hover:scale-105 hover:shadow-lg ${
+                    mainImage === img ? 'border-[#130447] ring-2 ring-[#130447]' : 'border-gray-200'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="p-6 flex flex-col justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-[#130447] mb-4">{sampleProduct.name}</h1>
+              <p className="text-2xl font-semibold text-[#130447] mb-4">₦{sampleProduct.price.toLocaleString()}</p>
+              <p className="text-gray-700 text-lg leading-relaxed mb-6">{sampleProduct.description}</p>
+            </div>
+
+            <button className="mt-4 w-full md:w-auto bg-[#130447] text-white px-8 py-3 rounded-lg hover:bg-[#0f0334] transition shadow-md text-lg font-semibold">
+              Add to Cart
+            </button>
           </div>
         </div>
-
-        {/* Product Details */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{product.name}</h1>
-          {product.oldPrice && (
-            <p className="text-sm text-gray-500 mt-1 line-through">₦{product.oldPrice.toLocaleString()}</p>
-          )}
-          <p className="text-osunblue text-2xl font-bold mt-1">₦{product.price.toLocaleString()}</p>
-
-          <p className="mt-6 text-gray-700 leading-relaxed">{product.description}</p>
-
-          <button
-            className="mt-6 bg-osunblue hover:bg-osunblue-600 text-white px-6 py-2 rounded"
-          >
-            Add to Cart
-          </button>
-        </div>
-      </div>
+      </section>
 
       {/* Related Products */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">You may also like</h2>
-        <div className="flex gap-6 overflow-x-auto pb-2 scrollbar-hide">
-          {related.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow w-60 shrink-0">
-              <img src={item.image} alt={item.name} className="w-full h-48 object-cover rounded-t" />
-              <div className="p-4">
-                <h4 className="text-sm font-semibold text-gray-800 truncate">{item.name}</h4>
-                <p className="text-osunblue font-bold text-sm mt-1">₦{item.price.toLocaleString()}</p>
+      <section className="max-w-6xl mx-auto px-4 pb-20">
+        <h2 className="text-2xl font-bold text-[#130447] mb-6">Related Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {relatedProducts.map((product) => (
+            <div
+              key={product.id}
+              className="relative bg-white rounded-xl shadow-md overflow-hidden group transition hover:shadow-xl"
+            >
+              <Link href={`/products/${product.id}`}>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold text-gray-900">{product.name}</h3>
+                  <p className="text-[#130447] font-bold mt-2 text-lg">₦{product.price.toLocaleString()}</p>
+                </div>
+              </Link>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-[#130447]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center space-y-3">
+                <button className="px-5 py-2 bg-white text-[#130447] rounded-md font-medium hover:bg-gray-100 shadow">
+                  Add to Cart
+                </button>
                 <Link
-                  href={`/products/${item.id}`}
-                  className="inline-block mt-3 text-xs text-white bg-osunblue px-3 py-1 rounded hover:bg-osunblue-600"
+                  href={`/products/${product.id}`}
+                  className="px-5 py-2 bg-white text-[#130447] rounded-md font-medium hover:bg-gray-100 shadow"
                 >
                   View Details
                 </Link>
@@ -92,7 +131,7 @@ export default function ProductDetails() {
             </div>
           ))}
         </div>
-      </div>
-    </div>
-  );
+      </section>
+    </AppLayout>
+  )
 }

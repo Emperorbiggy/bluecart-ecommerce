@@ -20,6 +20,12 @@ Route::get('/products/{id}', function ($id) {
 Route::get('/products', function () {
     return Inertia::render('Products');
 });
+Route::get('/contact', function () {
+    return Inertia::render('ContactUs');
+});
+Route::get('/about', function () {
+    return Inertia::render('AboutUs');
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');
