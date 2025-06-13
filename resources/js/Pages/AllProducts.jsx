@@ -1,16 +1,7 @@
+// pages/AllProducts.jsx
 import { useState } from 'react'
-import {
-  Menu,
-  X,
-  ShoppingCart,
-  Box,
-  PlusCircle,
-  ClipboardList,
-  CheckCircle,
-  User,
-} from 'lucide-react'
+import AdminLayout from '../Layouts/AdminLayout'
 
-// Sample product data (same as before, trimmed for brevity)
 const products = {
   branded: [
     {
@@ -27,126 +18,189 @@ const products = {
       image:
         'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2071&auto=format&fit=crop',
     },
+    {
+      id: 3,
+      name: 'Perfume Spray',
+      price: 4500,
+      image:
+        'https://images.unsplash.com/photo-1699723018826-f77ad1d78f28?q=80&w=1964&auto=format&fit=crop',
+    },
+    {
+      id: 4,
+      name: 'Smartphone',
+      price: 65000,
+      image:
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1974&auto=format&fit=crop',
+    },
+    {
+      id: 5,
+      name: 'Power Banks',
+      price: 65000,
+      image:
+        'https://images.unsplash.com/photo-1745889763766-037ad5b456e2?q=80&w=1936&auto=format&fit=crop',
+    },
+    {
+      id: 6,
+      name: 'EarPod',
+      price: 65000,
+      image:
+        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
+    },
   ],
-  // Add other categories here...
+  clothing: [
+    {
+      id: 7,
+      name: 'Men’s Shirt',
+      price: 7000,
+      image:
+        'https://images.unsplash.com/photo-1602810320073-1230c46d89d4?q=80&w=1974&auto=format&fit=crop',
+    },
+    {
+      id: 8,
+      name: 'Women’s Dress',
+      price: 11000,
+      image:
+        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1976&auto=format&fit=crop',
+    },
+    {
+      id: 9,
+      name: 'Winter Jacket',
+      price: 17000,
+      image:
+        'https://images.unsplash.com/photo-1706765779494-2705542ebe74?q=80&w=1951&auto=format&fit=crop',
+    },
+    {
+      id: 10,
+      name: 'Night wear',
+      price: 17000,
+      image:
+        'https://images.unsplash.com/photo-1584061606850-a57652a323a4?q=80&w=1935&auto=format&fit=crop',
+    },
+    {
+      id: 11,
+      name: 'Joggers',
+      price: 17000,
+      image:
+        'https://images.unsplash.com/photo-1580906853305-5702e648164e?q=80&w=1974&auto=format&fit=crop',
+    },
+  ],
+  gadgets: [
+    {
+      id: 12,
+      name: 'Wireless Earbuds',
+      price: 22000,
+      image:
+        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
+    },
+    {
+      id: 13,
+      name: 'Bluetooth Speaker',
+      price: 18000,
+      image:
+        'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=1974&auto=format&fit=crop',
+    },
+    {
+      id: 14,
+      name: 'Centered Table',
+      price: 32000,
+      image:
+        'https://images.unsplash.com/photo-1522668261254-d408d69b39cd?q=80&w=2080&auto=format&fit=crop',
+    },
+    {
+      id: 15,
+      name: 'Smart TV',
+      price: 32000,
+      image:
+        'https://images.unsplash.com/photo-1646861039459-fd9e3aabf3fb?q=80&w=1926&auto=format&fit=crop',
+    },
+    {
+      id: 16,
+      name: 'Headphones',
+      price: 32000,
+      image:
+        'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=2070&auto=format&fit=crop',
+    },
+  ],
+  home_appliances: [
+    {
+      id: 17,
+      name: 'Air Conditioner',
+      price: 120000,
+      image:
+        'https://images.unsplash.com/photo-1665826254141-bfa10685e002?q=80&w=2070&auto=format&fit=crop',
+    },
+    {
+      id: 18,
+      name: 'Blender',
+      price: 18000,
+      image:
+        'https://images.unsplash.com/photo-1570222094114-d054a817e56b?q=80&w=2105&auto=format&fit=crop',
+    },
+    {
+      id: 19,
+      name: 'Microwave Oven',
+      price: 40000,
+      image:
+        'https://plus.unsplash.com/premium_photo-1673439305380-79947d273735?q=80&w=1974&auto=format&fit=crop',
+    },
+    {
+      id: 20,
+      name: 'Gas Cooker',
+      price: 40000,
+      image:
+        'https://images.unsplash.com/photo-1609211373254-b52e03ba0c85?q=80&w=1976&auto=format&fit=crop',
+    },
+    {
+      id: 21,
+      name: 'Electronic Cooker',
+      price: 40000,
+      image:
+        'https://images.unsplash.com/photo-1738220543088-aa5b0f83733b?q=80&w=2070&auto=format&fit=crop',
+    },
+  ],
 }
-
-const nav = [
-  { key: 'dashboard', label: 'Dashboard', icon: ShoppingCart },
-  { key: 'all-products', label: 'All Products', icon: Box },
-  { key: 'add-product', label: 'Add Product', icon: PlusCircle },
-  { key: 'pending-orders', label: 'Pending Orders', icon: ClipboardList },
-  { key: 'complete-orders', label: 'Complete Orders', icon: CheckCircle },
-  { key: 'profile', label: 'Profile', icon: User },
-]
 
 export default function AllProducts() {
   const [activeTab, setActiveTab] = useState('all-products')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <div className="flex bg-gray-100 overflow-hidden min-h-screen relative">
-      {/* Sidebar - Responsive */}
-      <aside
-        className={`fixed z-40 top-0 left-0 h-full w-64 bg-white shadow-md transition-transform transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 md:relative md:shadow-none`}
-      >
-        <div className="flex items-center justify-between px-6 py-5 border-b">
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="text-osunblue w-6 h-6" />
-            <h1 className="text-xl font-bold text-osunblue">BlueCart</h1>
-          </div>
-          <button
-            className="md:hidden text-gray-700"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          {nav.map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => {
-                setActiveTab(key)
-                setIsSidebarOpen(false)
-              }}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg w-full text-left ${
-                activeTab === key
-                  ? 'bg-osunblue text-white'
-                  : 'hover:bg-gray-200 text-gray-700'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+    <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <h2 className="text-2xl font-semibold text-osunblue mb-6">
+        All Products
+      </h2>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col md:ml-64">
-        {/* Topbar */}
-        <header className="bg-white shadow px-4 py-4 flex justify-between items-center sticky top-0 z-10">
-          <button
-            className="md:hidden text-gray-700"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="flex items-center gap-3">
-            <img
-              src="https://via.placeholder.com/40"
-              className="rounded-full w-10 h-10"
-              alt="Admin"
-            />
-            <span className="font-medium text-gray-700 hidden sm:block">
-              Admin Name
-            </span>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="p-4 md:p-8 flex-1 overflow-y-auto">
-          <h2 className="text-2xl font-semibold text-osunblue mb-6">
-            All Products
-          </h2>
-
-          {Object.entries(products).map(([category, items]) => (
-            <div key={category} className="mb-10">
-              <h3 className="text-lg font-bold capitalize text-gray-700 mb-4">
-                {category.replace('_', ' ')}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {items.map((product) => (
-                  <div
-                    key={`${category}-${product.id}-${product.name}`}
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="p-4">
-                      <h4 className="text-lg font-semibold text-gray-800">
-                        {product.name}
-                      </h4>
-                      <p className="text-gray-600 mt-1">
-                        ₦{product.price.toLocaleString()}
-                      </p>
-                      <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                        Active
-                      </span>
-                    </div>
-                  </div>
-                ))}
+      {Object.entries(products).map(([category, items]) => (
+        <div key={category} className="mb-10">
+          <h3 className="text-lg font-bold capitalize text-gray-700 mb-4">
+            {category.replace('_', ' ')}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {items.map((product) => (
+              <div
+                key={`${category}-${product.id}-${product.name}`}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-40 object-cover"
+                />
+                <div className="p-4">
+                  <h4 className="text-lg font-semibold text-gray-800">
+                    {product.name}
+                  </h4>
+                  <p className="text-gray-600 mt-1">
+                    ₦{product.price.toLocaleString()}
+                  </p>
+                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                    Active
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </main>
-      </div>
-    </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </AdminLayout>
   )
 }
