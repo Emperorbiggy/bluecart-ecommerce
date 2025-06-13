@@ -1,30 +1,8 @@
-// resources/js/Pages/Home.jsx
+import { Link } from '@inertiajs/react'
+import AppLayout from '@/Layouts/AppLayout'
+import { useEffect, useState } from 'react'
 
-import { useEffect, useState } from 'react';
-import { Link } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
-
-const heroSlides = [
-  {
-    id: 1,
-    image: 'https://via.placeholder.com/1600x600?text=Style+1',
-    title: 'Discover Endless Style',
-    description: 'Shop curated selections of fashion, gadgets, and accessories.',
-  },
-  {
-    id: 2,
-    image: 'https://via.placeholder.com/1600x600?text=Style+2',
-    title: 'Best Prices. Fast Delivery.',
-    description: 'Get unbeatable deals on everything you love.',
-  },
-  {
-    id: 3,
-    image: 'https://via.placeholder.com/1600x600?text=Style+3',
-    title: 'Quality You Trust',
-    description: 'Only verified vendors. Guaranteed satisfaction.',
-  },
-];
-
+// Sample product data
 const products = {
   branded: [
     { id: 1, name: 'Body Massager', price: 9500, image: 'https://via.placeholder.com/300x300?text=Massager' },
@@ -39,8 +17,28 @@ const products = {
     { id: 6, name: 'Wireless Earbuds', price: 22000, image: 'https://via.placeholder.com/300x300?text=Earbuds' },
     { id: 7, name: 'Bluetooth Speaker', price: 18000, image: 'https://via.placeholder.com/300x300?text=Speaker' },
   ],
-};
+}
 
+// Slider content
+const heroSlides = [
+  {
+    title: 'Discover Endless Style',
+    description: 'Shop curated selections of fashion, gadgets, and accessories. Best prices. Fast delivery. Quality you trust.',
+    image: 'https://via.placeholder.com/1600x600?text=Fashion+Deals',
+  },
+  {
+    title: 'Tech Gadgets & Accessories',
+    description: 'Explore our range of cutting-edge gadgets at unbeatable prices.',
+    image: 'https://via.placeholder.com/1600x600?text=Gadgets+Sale',
+  },
+  {
+    title: 'Stay Trendy, Stay Cool',
+    description: 'Browse the latest fashion pieces tailored for you.',
+    image: 'https://via.placeholder.com/1600x600?text=New+Arrivals',
+  },
+]
+
+// Reusable card
 function ProductCard({ product }) {
   return (
     <div className="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden w-60 shrink-0">
@@ -56,36 +54,34 @@ function ProductCard({ product }) {
         </Link>
       </div>
     </div>
-  );
+  )
 }
 
+// Main component
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [])
 
-  const current = heroSlides[currentSlide];
+  const current = heroSlides[currentSlide]
 
   return (
     <>
-      {/* Hero Slider Full Width */}
+      {/* Hero Section */}
       <section
-        className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center text-center text-white"
+        className="relative w-screen h-[500px] md:h-[600px] flex items-center justify-center text-center text-white"
         style={{
           backgroundImage: `url(${current.image})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        {/* Overlay */}
         <div className="absolute inset-0 bg-osunblue/60 backdrop-brightness-75"></div>
-
-        {/* Content */}
         <div className="relative z-10 px-4 w-full max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{current.title}</h1>
           <p className="text-white/90 text-base md:text-lg mb-6">{current.description}</p>
@@ -101,6 +97,7 @@ export default function Home() {
       {/* Deal of the Day */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-10 items-center">
+          {/* Banner */}
           <div className="bg-yellow-100 rounded-xl p-6 md:p-10 shadow-md relative overflow-hidden">
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800">🔥 Deal of the Day</h3>
             <p className="text-gray-600 mt-2 text-base">
@@ -119,6 +116,7 @@ export default function Home() {
             />
           </div>
 
+          {/* Deal Product */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-sm w-full mx-auto">
             <img
               src="https://via.placeholder.com/400x300?text=Smart+Watch+Series+X"
@@ -140,16 +138,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Product Sections */}
+      {/* Product Categories */}
       <div className="max-w-7xl mx-auto py-16 px-4 space-y-20">
         {Object.entries(products).map(([category, items]) => (
           <div key={category}>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold capitalize text-gray-800">{category} Deals</h2>
-              <Link href={`/category/${category}`} className="text-osunblue text-sm hover:underline">View All</Link>
+              <Link href={`/category/${category}`} className="text-osunblue text-sm hover:underline">
+                View All
+              </Link>
             </div>
             <div className="flex gap-6 overflow-x-auto pb-2 scrollbar-hide">
-              {items.map(product => (
+              {items.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -157,7 +157,8 @@ export default function Home() {
         ))}
       </div>
     </>
-  );
+  )
 }
 
-Home.layout = (page) => <AppLayout>{page}</AppLayout>;
+// Attach Layout
+Home.layout = (page) => <AppLayout>{page}</AppLayout>
