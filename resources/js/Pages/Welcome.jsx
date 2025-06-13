@@ -31,8 +31,8 @@ const products = {
     { id: 8, name: 'Air Conditioner', price: 120000, image: 'https://images.unsplash.com/photo-1665826254141-bfa10685e002?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { id: 9, name: 'Blender', price: 18000, image: 'https://images.unsplash.com/photo-1570222094114-d054a817e56b?q=80&w=2105&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { id: 13, name: 'Microwave Oven', price: 40000, image: 'https://plus.unsplash.com/premium_photo-1673439305380-79947d273735?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 13, name: 'Microwave Oven', price: 40000, image: 'https://images.unsplash.com/photo-1585951237317-2b5b0aaeb5d0?q=80&w=1932&auto=format&fit=crop' },
-    { id: 13, name: 'Microwave Oven', price: 40000, image: 'https://images.unsplash.com/photo-1585951237317-2b5b0aaeb5d0?q=80&w=1932&auto=format&fit=crop' },
+    { id: 13, name: 'Gas Cooker', price: 40000, image: 'https://images.unsplash.com/photo-1585951237317-2b5b0aaeb5d0?q=80&w=1932&auto=format&fit=crop' },
+    { id: 13, name: 'Electronic Cooker', price: 40000, image: 'https://images.unsplash.com/photo-1585951237317-2b5b0aaeb5d0?q=80&w=1932&auto=format&fit=crop' },
   ],
 }
 
