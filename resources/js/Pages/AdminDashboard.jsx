@@ -6,6 +6,7 @@ import {
   ClipboardList,
   CheckCircle,
   User,
+  ShoppingBag,
 } from 'lucide-react'
 import {
   Chart as ChartJS,
@@ -19,7 +20,7 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 
-// Chart.js registration
+// Register Chart.js modules
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -55,7 +56,7 @@ export default function AdminDashboard() {
         label: 'Sales',
         data: [12, 19, 8, 25],
         borderColor: '#130447',
-        backgroundColor: 'rgba(19, 4, 71, 0.3)',
+        backgroundColor: 'rgba(19, 4, 71, 0.2)',
         tension: 0.4,
       },
     ],
@@ -66,39 +67,28 @@ export default function AdminDashboard() {
       case 'dashboard':
         return (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-gray-500 text-sm">Products</h3>
-                <p className="text-2xl font-bold">{stats.products}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-gray-500 text-sm">Pending Orders</h3>
-                <p className="text-2xl font-bold">{stats.pending}</p>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-gray-500 text-sm">Complete Orders</h3>
-                <p className="text-2xl font-bold">{stats.complete}</p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <Card icon={ShoppingBag} label="Products" count={stats.products} />
+              <Card icon={ClipboardList} label="Pending Orders" count={stats.pending} />
+              <Card icon={CheckCircle} label="Complete Orders" count={stats.complete} />
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-6 w-full max-w-4xl mx-auto">
               <h4 className="text-lg font-semibold mb-4">Sales Overview</h4>
-              <Line data={chartData} />
+              <div className="h-64">
+                <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+              </div>
             </div>
           </>
         )
-      case 'all-products':
-        return <p className="text-gray-700">📦 All products will display here...</p>
-      case 'add-product':
-        return <p className="text-gray-700">➕ Add Product form here...</p>
-      case 'pending-orders':
-        return <p className="text-gray-700">⏳ Pending orders go here...</p>
-      case 'complete-orders':
-        return <p className="text-gray-700">✅ Completed orders go here...</p>
-      case 'profile':
-        return <p className="text-gray-700">👤 Admin profile management...</p>
       default:
-        return null
+        return (
+          <div className="bg-white rounded-lg shadow p-6">
+            <p className="text-gray-700">
+              {activeTab.split('-').join(' ').replace(/\b\w/g, l => l.toUpperCase())} content here...
+            </p>
+          </div>
+        )
     }
   }
 
@@ -133,7 +123,7 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
+        {/* Header */}
         <header className="bg-white shadow px-6 py-4 flex justify-end items-center">
           <img
             src="https://via.placeholder.com/40"
@@ -143,8 +133,23 @@ export default function AdminDashboard() {
           <span className="font-medium text-gray-700">Admin Name</span>
         </header>
 
-        {/* Content */}
-        <main className="p-8 overflow-y-auto flex-1">{renderMain()}</main>
+        {/* Main */}
+        <main className="p-6 lg:p-8 overflow-y-auto flex-1">{renderMain()}</main>
+      </div>
+    </div>
+  )
+}
+
+// Card component
+function Card({ icon: Icon, label, count }) {
+  return (
+    <div className="bg-osunblue text-white rounded-lg shadow p-5 flex items-center space-x-4">
+      <div className="bg-white text-osunblue p-3 rounded-full shadow">
+        <Icon className="w-6 h-6" />
+      </div>
+      <div>
+        <p className="text-sm">{label}</p>
+        <h2 className="text-2xl font-bold">{count}</h2>
       </div>
     </div>
   )
