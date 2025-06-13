@@ -69,26 +69,32 @@ function ProductCard({ product }) {
         alt={product.name}
         className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
       />
+
       <div className="p-4">
         <h4 className="font-semibold text-sm mb-1 truncate">{product.name}</h4>
-        <p className="text-osunblue font-bold text-sm">₦{product.price.toLocaleString()}</p>
-        <Link
-          href={`/products/${product.id}`}
-          className="text-xs mt-3 inline-block text-white bg-osunblue px-3 py-1 rounded hover:bg-osunblue-600"
-        >
-          View Details
-        </Link>
+        <p className="text-osunblue font-bold text-sm">
+          ₦{product.price.toLocaleString()}
+        </p>
       </div>
 
       {/* Overlay on hover */}
-      <div className="absolute inset-0 bg-osunblue/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
-        <button className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-white/30">
-          Add to Cart
-        </button>
+      <div className="absolute inset-0 bg-[#130447]/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
+        <div className="flex flex-col items-center gap-2 px-4">
+          <button className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-osunblue/30 text-sm">
+            Add to Cart
+          </button>
+          <Link
+            href={`/products/${product.id}`}
+            className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-osunblue/30 text-center"
+          >
+            View Details
+          </Link>
+        </div>
       </div>
     </div>
-  )
+  );
 }
+
 
 
 export default function Home() {
