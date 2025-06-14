@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AdminLayout from '../Layouts/AdminLayout'
+import { addProduct } from '../utils/api' // <-- import your api helper
 
 export default function AddProduct() {
   const [activeTab, setActiveTab] = useState('app-product')
@@ -16,12 +17,16 @@ export default function AddProduct() {
     uploadedImages: [null],
   })
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+
   const priceNum = parseFloat(formData.price) || 0
   const discountNum = parseFloat(formData.discount) || 0
   const discountedPrice = priceNum - (priceNum * discountNum) / 100
 
   const handleChange = (e, index = null) => {
-    const { name, value, type, files } = e.target
+    const { name, value, files } = e.target
 
     if (name === 'images') {
       const images = [...formData.images]
@@ -54,34 +59,47 @@ export default function AddProduct() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
 
+    // Prepare product data as expected by addProduct API function
     const productToSubmit = {
       ...formData,
       price: priceNum,
       discount: discountNum,
-      discountedPrice,
       images:
         formData.imageInputType === 'url'
           ? formData.images.filter((url) => url.trim() !== '')
-          : formData.uploadedImages.filter((file) => file !== null),
+          : undefined,
+      uploadedImages:
+        formData.imageInputType === 'upload'
+          ? formData.uploadedImages.filter((file) => file !== null)
+          : undefined,
     }
 
-    console.log('Submitting product:', productToSubmit)
-    alert('Product submitted! Check console for details.')
-
-    setFormData({
-      name: '',
-      price: '',
-      category: '',
-      shortDescription: '',
-      details: '',
-      discount: '',
-      images: [''],
-      uploadedImages: [null],
-      imageInputType: 'url',
-    })
+    try {
+      await addProduct(productToSubmit)
+      setSuccess('Product added successfully!')
+      setFormData({
+        name: '',
+        price: '',
+        category: '',
+        shortDescription: '',
+        details: '',
+        discount: '',
+        images: [''],
+        uploadedImages: [null],
+        imageInputType: 'url',
+      })
+    } catch (err) {
+      console.error(err)
+      setError('Failed to add product. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -95,6 +113,14 @@ export default function AddProduct() {
           onSubmit={handleSubmit}
           className="max-w-3xl w-full mx-auto space-y-6 bg-white p-6 rounded shadow"
         >
+          {/* Display success or error */}
+          {success && (
+            <div className="p-2 mb-4 text-green-800 bg-green-100 rounded">{success}</div>
+          )}
+          {error && (
+            <div className="p-2 mb-4 text-red-800 bg-red-100 rounded">{error}</div>
+          )}
+
           {/* Product Name */}
           <div>
             <label className="block font-medium mb-1" htmlFor="name">
@@ -109,6 +135,7 @@ export default function AddProduct() {
               required
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Enter product name"
+              disabled={loading}
             />
           </div>
 
@@ -127,6 +154,7 @@ export default function AddProduct() {
               required
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Enter price"
+              disabled={loading}
             />
           </div>
 
@@ -142,8 +170,11 @@ export default function AddProduct() {
               onChange={handleChange}
               required
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
+              disabled={loading}
             >
-              <option value="" disabled>Select a category</option>
+              <option value="" disabled>
+                Select a category
+              </option>
               <option value="Branded">Branded</option>
               <option value="Clothing">Clothing</option>
               <option value="Gadgets">Gadgets</option>
@@ -166,6 +197,7 @@ export default function AddProduct() {
               onChange={handleChange}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Enter discount percentage"
+              disabled={loading}
             />
             {formData.discount && (
               <p className="mt-1 text-green-700 font-semibold">
@@ -187,6 +219,7 @@ export default function AddProduct() {
               rows={3}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Brief description of the product"
+              disabled={loading}
             />
           </div>
 
@@ -203,6 +236,7 @@ export default function AddProduct() {
               rows={5}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
               placeholder="Detailed description and specifications"
+              disabled={loading}
             />
           </div>
 
@@ -217,6 +251,7 @@ export default function AddProduct() {
                   value="url"
                   checked={formData.imageInputType === 'url'}
                   onChange={handleChange}
+                  disabled={loading}
                 />
                 <span>Image URL</span>
               </label>
@@ -227,6 +262,7 @@ export default function AddProduct() {
                   value="upload"
                   checked={formData.imageInputType === 'upload'}
                   onChange={handleChange}
+                  disabled={loading}
                 />
                 <span>Upload File</span>
               </label>
@@ -249,6 +285,7 @@ export default function AddProduct() {
                     onChange={(e) => handleChange(e, index)}
                     placeholder="Image URL"
                     className="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-osunblue"
+                    disabled={loading}
                   />
                   {formData.images.length > 1 && (
                     <button
@@ -256,6 +293,7 @@ export default function AddProduct() {
                       onClick={() => removeImageField(index)}
                       className="text-red-500 hover:text-red-700 font-bold px-2"
                       title="Remove this image"
+                      disabled={loading}
                     >
                       &times;
                     </button>
@@ -272,6 +310,7 @@ export default function AddProduct() {
                     accept="image/*"
                     onChange={(e) => handleChange(e, index)}
                     className="flex-grow border border-gray-300 rounded px-3 py-2"
+                    disabled={loading}
                   />
                   {formData.uploadedImages.length > 1 && (
                     <button
@@ -279,6 +318,7 @@ export default function AddProduct() {
                       onClick={() => removeImageField(index)}
                       className="text-red-500 hover:text-red-700 font-bold px-2"
                       title="Remove this image"
+                      disabled={loading}
                     >
                       &times;
                     </button>
@@ -290,6 +330,7 @@ export default function AddProduct() {
               type="button"
               onClick={addImageField}
               className="mt-2 px-3 py-1 bg-osunblue text-white rounded hover:bg-osunblue-dark transition"
+              disabled={loading}
             >
               Add More Images
             </button>
@@ -299,9 +340,10 @@ export default function AddProduct() {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-osunblue text-white px-6 py-2 rounded hover:bg-osunblue-dark transition"
+              className="bg-osunblue text-white px-6 py-2 rounded hover:bg-osunblue-dark transition disabled:opacity-50"
+              disabled={loading}
             >
-              Add Product
+              {loading ? 'Adding...' : 'Add Product'}
             </button>
           </div>
         </form>

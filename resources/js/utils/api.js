@@ -38,6 +38,15 @@ export const setAuthToken = (token) => {
   }
 };
 
+// Initialize token on import if exists (auto set token on page load)
+const initToken = () => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    setAuthToken(token);
+  }
+};
+initToken();
+
 export const login = async ({ email, password }) => {
   const response = await api.post(apiRoutes.login, { email, password });
 
@@ -53,13 +62,9 @@ export const login = async ({ email, password }) => {
   window.location.href = redirect;
 };
 
-// ✅ Fetch the current user info with token from api/me
+// Fetch the current user info with token from api/me
 export const fetchCurrentUser = async () => {
   try {
-    const token = localStorage.getItem('auth_token');
-    if (!token) throw new Error('No auth token found');
-
-    setAuthToken(token);
     const response = await api.get(apiRoutes.me);
     return response.data; // user data from backend
   } catch (error) {
@@ -86,6 +91,13 @@ export const fetchCurrentUser = async () => {
  * @returns {Promise} axios response promise
  */
 export const addProduct = async (productData) => {
+  // Ensure token is set before request
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('No auth token found. Please log in.');
+  }
+  setAuthToken(token);
+
   if (productData.imageInputType === 'upload' && productData.uploadedImages?.length) {
     // Use FormData for file uploads
     const formData = new FormData();
