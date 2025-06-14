@@ -32,26 +32,12 @@ Route::get('/about', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('UserDashboard');
 });
-Route::middleware(['auth', 'isadmin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('admin.dashboard');
-
-    Route::get('/products', function () {
-        return Inertia::render('AllProducts');
-    });
-
-    Route::get('/create/product', function () {
-        return Inertia::render('AddProduct');
-    });
-
-    Route::get('/orders', function () {
-        return Inertia::render('Orders');
-    });
-
-    Route::get('/profile', function () {
-        return Inertia::render('AdminProfilePage');
-    });
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', fn () => Inertia::render('AdminDashboard'))->name('admin.dashboard');
+    Route::get('/products', fn () => Inertia::render('AllProducts'))->name('admin.products');
+    Route::get('/create/product', fn () => Inertia::render('AddProduct'))->name('admin.products.create');
+    Route::get('/orders', fn () => Inertia::render('Orders'))->name('admin.orders');
+    Route::get('/profile', fn () => Inertia::render('AdminProfilePage'))->name('admin.profile');
 });
 
 Route::get('/cart', function () {
@@ -60,6 +46,7 @@ Route::get('/cart', function () {
 Route::get('/checkout', function () {
     return Inertia::render('Checkout');
 });
+
 
 
 Route::get('/', fn () => Inertia::render('Welcome'));
@@ -72,7 +59,7 @@ Route::get('/', fn () => Inertia::render('Welcome'));
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+// Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+// Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 require __DIR__.'/auth.php';

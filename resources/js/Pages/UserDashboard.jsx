@@ -1,12 +1,15 @@
 import { useState } from 'react'
+
 import AppLayout from '../Layouts/AppLayout'
 import {
   User,
   ShoppingCart,
   CreditCard,
   PackageCheck,
-  LogOut
+  LogOut,
 } from 'lucide-react'
+import axios from 'axios'
+import { router } from '@inertiajs/react'
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
@@ -29,8 +32,12 @@ export default function UserDashboard() {
     { key: 'cart', label: 'Cart', icon: <ShoppingCart size={18} /> },
     { key: 'billing', label: 'Billing Address', icon: <CreditCard size={18} /> },
     { key: 'orders', label: 'Orders', icon: <PackageCheck size={18} /> },
-    { key: 'logout', label: 'Logout', icon: <LogOut size={18} /> }
+    { key: 'logout', label: 'Logout', icon: <LogOut size={18} /> },
   ]
+
+  const handleLogout = () => {
+  router.post(route('logout'));
+};
 
   const renderContent = () => {
     switch (activeTab) {
@@ -136,7 +143,7 @@ export default function UserDashboard() {
         )
 
       case 'logout':
-        return <p className="text-red-600 font-semibold">You have been logged out.</p>
+        return <p className="text-gray-600">Logging out...</p>
 
       default:
         return null
@@ -160,7 +167,13 @@ export default function UserDashboard() {
               {tabs.map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => {
+                    if (tab.key === 'logout') {
+                      handleLogout()
+                    } else {
+                      setActiveTab(tab.key)
+                    }
+                  }}
                   className={`flex items-center gap-2 px-4 py-2 w-full text-sm font-medium rounded-md transition ${
                     activeTab === tab.key
                       ? 'bg-[#130447] text-white'

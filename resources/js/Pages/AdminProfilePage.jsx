@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminLayout from '../Layouts/AdminLayout'
+import { fetchCurrentUser } from '../utils/api'  // adjust path if needed
 
 export default function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState('profile')
 
   const [form, setForm] = useState({
-    name: 'Samuel Ojeva',
-    email: 'admin@example.com',
-    phone: '+2348012345678',
+    name: '',
+    email: '',
+    phone: '',
   })
 
   const [passwords, setPasswords] = useState({
@@ -15,6 +16,26 @@ export default function AdminProfilePage() {
     newPassword: '',
     confirmPassword: '',
   })
+
+  // Fetch user data on mount
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await fetchCurrentUser()
+const user = userData.user  // unwrap here
+setForm({
+  name: user.name || '',
+  email: user.email || '',
+  phone: user.phone || '',
+})
+
+      } catch (error) {
+        console.error('Failed to load user:', error)
+      }
+    }
+
+    loadUser()
+  }, [])
 
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -26,6 +47,7 @@ export default function AdminProfilePage() {
 
   const updateProfile = () => {
     alert('Profile Updated ✅ (Demo only)')
+    // Here you can call your API to update the profile
   }
 
   const changePassword = () => {
@@ -35,6 +57,7 @@ export default function AdminProfilePage() {
     }
 
     alert('Password Changed ✅ (Demo only)')
+    // Here you can call your API to change the password
   }
 
   return (

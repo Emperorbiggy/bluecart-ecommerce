@@ -1,4 +1,6 @@
 import AdminLayout from '../Layouts/AdminLayout'
+import React, { useState, useEffect } from 'react';
+import { fetchCurrentUser } from '@/utils/api';
 import {
   ShoppingBag,
   ClipboardList,
@@ -28,6 +30,9 @@ ChartJS.register(
 )
 
 export default function AdminDashboard() {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // optional loading state
+  const [error, setError] = useState(null);     // optional error state
   const stats = {
     products: 124,
     pending: 8,
@@ -46,6 +51,23 @@ export default function AdminDashboard() {
       },
     ],
   }
+  useEffect(() => {
+    async function getUserData() {
+      try {
+        setLoading(true);
+        const userData = await fetchCurrentUser();
+        setUser(userData);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch user data.');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getUserData();
+  }, []);
 
   return (
     <AdminLayout>
