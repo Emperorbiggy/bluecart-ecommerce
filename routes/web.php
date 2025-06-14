@@ -17,7 +17,7 @@ use Inertia\Inertia;
 // });
 
 Route::get('/products/{id}', function ($id) {
-    return Inertia::render('ProductDetails');
+    return Inertia::render('ProductDetails', ['id' => $id]);
 });
 Route::get('/products', function () {
     return Inertia::render('Products');
@@ -39,6 +39,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/orders', fn () => Inertia::render('Orders'))->name('admin.orders');
     Route::get('/profile', fn () => Inertia::render('AdminProfilePage'))->name('admin.profile');
 });
+
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');

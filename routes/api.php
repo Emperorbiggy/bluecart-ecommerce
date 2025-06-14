@@ -12,3 +12,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('a
 
 Route::middleware('auth:api')->get('/me', [AuthenticatedSessionController::class, 'users']);
 
+Route::get('/products', [ProductController::class, 'index']);
+Route::put('/products/{id}', [ProductController::class, 'update']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{id}/related', [ProductController::class, 'getRelatedProducts']);

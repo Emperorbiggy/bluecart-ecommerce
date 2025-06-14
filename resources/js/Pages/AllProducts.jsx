@@ -1,167 +1,114 @@
-// pages/AllProducts.jsx
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AdminLayout from '../Layouts/AdminLayout'
-
-const products = {
-  branded: [
-    {
-      id: 1,
-      name: 'Laptops',
-      price: 9500,
-      image:
-        'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop',
-    },
-    {
-      id: 2,
-      name: 'Running Shoes',
-      price: 15000,
-      image:
-        'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2071&auto=format&fit=crop',
-    },
-    {
-      id: 3,
-      name: 'Perfume Spray',
-      price: 4500,
-      image:
-        'https://images.unsplash.com/photo-1699723018826-f77ad1d78f28?q=80&w=1964&auto=format&fit=crop',
-    },
-    {
-      id: 4,
-      name: 'Smartphone',
-      price: 65000,
-      image:
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1974&auto=format&fit=crop',
-    },
-    {
-      id: 5,
-      name: 'Power Banks',
-      price: 65000,
-      image:
-        'https://images.unsplash.com/photo-1745889763766-037ad5b456e2?q=80&w=1936&auto=format&fit=crop',
-    },
-    {
-      id: 6,
-      name: 'EarPod',
-      price: 65000,
-      image:
-        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
-    },
-  ],
-  clothing: [
-    {
-      id: 7,
-      name: 'Men’s Shirt',
-      price: 7000,
-      image:
-        'https://images.unsplash.com/photo-1602810320073-1230c46d89d4?q=80&w=1974&auto=format&fit=crop',
-    },
-    {
-      id: 8,
-      name: 'Women’s Dress',
-      price: 11000,
-      image:
-        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1976&auto=format&fit=crop',
-    },
-    {
-      id: 9,
-      name: 'Winter Jacket',
-      price: 17000,
-      image:
-        'https://images.unsplash.com/photo-1706765779494-2705542ebe74?q=80&w=1951&auto=format&fit=crop',
-    },
-    {
-      id: 10,
-      name: 'Night wear',
-      price: 17000,
-      image:
-        'https://images.unsplash.com/photo-1584061606850-a57652a323a4?q=80&w=1935&auto=format&fit=crop',
-    },
-    {
-      id: 11,
-      name: 'Joggers',
-      price: 17000,
-      image:
-        'https://images.unsplash.com/photo-1580906853305-5702e648164e?q=80&w=1974&auto=format&fit=crop',
-    },
-  ],
-  gadgets: [
-    {
-      id: 12,
-      name: 'Wireless Earbuds',
-      price: 22000,
-      image:
-        'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
-    },
-    {
-      id: 13,
-      name: 'Bluetooth Speaker',
-      price: 18000,
-      image:
-        'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=1974&auto=format&fit=crop',
-    },
-    {
-      id: 14,
-      name: 'Centered Table',
-      price: 32000,
-      image:
-        'https://images.unsplash.com/photo-1522668261254-d408d69b39cd?q=80&w=2080&auto=format&fit=crop',
-    },
-    {
-      id: 15,
-      name: 'Smart TV',
-      price: 32000,
-      image:
-        'https://images.unsplash.com/photo-1646861039459-fd9e3aabf3fb?q=80&w=1926&auto=format&fit=crop',
-    },
-    {
-      id: 16,
-      name: 'Headphones',
-      price: 32000,
-      image:
-        'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=2070&auto=format&fit=crop',
-    },
-  ],
-  home_appliances: [
-    {
-      id: 17,
-      name: 'Air Conditioner',
-      price: 120000,
-      image:
-        'https://images.unsplash.com/photo-1665826254141-bfa10685e002?q=80&w=2070&auto=format&fit=crop',
-    },
-    {
-      id: 18,
-      name: 'Blender',
-      price: 18000,
-      image:
-        'https://images.unsplash.com/photo-1570222094114-d054a817e56b?q=80&w=2105&auto=format&fit=crop',
-    },
-    {
-      id: 19,
-      name: 'Microwave Oven',
-      price: 40000,
-      image:
-        'https://plus.unsplash.com/premium_photo-1673439305380-79947d273735?q=80&w=1974&auto=format&fit=crop',
-    },
-    {
-      id: 20,
-      name: 'Gas Cooker',
-      price: 40000,
-      image:
-        'https://images.unsplash.com/photo-1609211373254-b52e03ba0c85?q=80&w=1976&auto=format&fit=crop',
-    },
-    {
-      id: 21,
-      name: 'Electronic Cooker',
-      price: 40000,
-      image:
-        'https://images.unsplash.com/photo-1738220543088-aa5b0f83733b?q=80&w=2070&auto=format&fit=crop',
-    },
-  ],
-}
+import { getAllProducts, updateProduct } from '../utils/api'
 
 export default function AllProducts() {
   const [activeTab, setActiveTab] = useState('all-products')
+  const [products, setProducts] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [editForm, setEditForm] = useState({
+    name: '',
+    price: '',
+    category: '',
+    shortDescription: '',
+    details: '',
+    discount: '',
+    imageInputType: 'url',
+    images: [''],
+    uploadedImages: [null],
+  })
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    setLoading(true)
+    const data = await getAllProducts()
+
+    const parsedProducts = data.map((product) => {
+      const parsedImages =
+        typeof product.images === 'string'
+          ? JSON.parse(product.images)
+          : product.images
+      return { ...product, images: parsedImages }
+    })
+
+    const grouped = parsedProducts.reduce((acc, product) => {
+      const key = product.category || 'uncategorized'
+      if (!acc[key]) acc[key] = []
+      acc[key].push(product)
+      return acc
+    }, {})
+
+    setProducts(grouped)
+    setLoading(false)
+  }
+
+  const openEditModal = (product) => {
+    const parsedImages =
+      typeof product.images === 'string'
+        ? JSON.parse(product.images)
+        : Array.isArray(product.images)
+        ? product.images
+        : ['']
+
+    setEditingProduct(product)
+    setEditForm({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      shortDescription: product.short_description || '',
+      details: product.details || '',
+      discount: product.discount || '',
+      imageInputType: 'url',
+      images: parsedImages,
+      uploadedImages: [null],
+    })
+  }
+
+  const closeEditModal = () => {
+    setEditingProduct(null)
+  }
+
+  const handleUpdate = async () => {
+  try {
+    let payload
+
+    if (editForm.imageInputType === 'upload') {
+      payload = new FormData()
+      payload.append('name', editForm.name)
+      payload.append('price', editForm.price)
+      payload.append('category', editForm.category)
+      payload.append('discount', editForm.discount)
+      payload.append('short_description', editForm.shortDescription) // ✅ fixed
+      payload.append('details', editForm.details) // ✅ already correct
+
+      editForm.uploadedImages.forEach((file, i) => {
+        if (file) payload.append('images[]', file)
+      })
+    } else {
+      payload = {
+        name: editForm.name,
+        price: editForm.price,
+        category: editForm.category,
+        discount: editForm.discount,
+        short_description: editForm.shortDescription, // ✅ fixed
+        details: editForm.details, // ✅ already correct
+        images: editForm.images,
+      }
+    }
+
+    await updateProduct(editingProduct.id, payload)
+    closeEditModal()
+    fetchProducts()
+  } catch (error) {
+    alert('Update failed')
+    console.error(error)
+  }
+}
+
 
   return (
     <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
@@ -169,38 +116,286 @@ export default function AllProducts() {
         All Products
       </h2>
 
-      {Object.entries(products).map(([category, items]) => (
-        <div key={category} className="mb-10">
-          <h3 className="text-lg font-bold capitalize text-gray-700 mb-4">
-            {category.replace('_', ' ')}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {items.map((product) => (
-              <div
-                key={`${category}-${product.id}-${product.name}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-40 object-cover"
+      {loading ? (
+        <p>Loading products...</p>
+      ) : Object.entries(products).length === 0 ? (
+        <p>No products found.</p>
+      ) : (
+        Object.entries(products).map(([category, items]) => (
+          <div key={category} className="mb-10">
+            <h3 className="text-lg font-bold capitalize text-gray-700 mb-4">
+              {category.replace('_', ' ')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {items.map((product) => (
+                <div
+                  key={`${category}-${product.id}-${product.name}`}
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                >
+                  <img
+                    src={product.images?.[0] || '/placeholder.png'}
+                    alt={product.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-800">
+                        {product.name}
+                      </h4>
+                      <p className="text-gray-600 mt-1">
+                        ₦{product.price.toLocaleString()}
+                      </p>
+                      <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                        Active
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="mt-4 bg-osunblue hover:bg-blue-900 text-white text-sm px-4 py-2 rounded-md transition"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+
+      {/* Edit Modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white w-full max-w-md p-6 rounded-xl shadow-lg overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-bold mb-4 text-gray-800">
+              Edit Product: {editingProduct.name}
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleUpdate()
+              }}
+            >
+              {/* Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
-                <div className="p-4">
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    {product.name}
-                  </h4>
-                  <p className="text-gray-600 mt-1">
-                    ₦{product.price.toLocaleString()}
-                  </p>
-                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                    Active
-                  </span>
+              </div>
+
+              {/* Price */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Price
+                </label>
+                <input
+                  type="number"
+                  value={editForm.price}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, price: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+
+              {/* Discount */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Discount (%)
+                </label>
+                <input
+                  type="number"
+                  value={editForm.discount}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, discount: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+
+              {/* Category */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={editForm.category}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, category: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+
+              {/* Short Description */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Short Description
+                </label>
+                <textarea
+                  value={editForm.shortDescription}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      shortDescription: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={2}
+                />
+              </div>
+
+              {/* Details */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Details
+                </label>
+                <textarea
+                  value={editForm.details}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, details: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={4}
+                />
+              </div>
+
+              {/* Image Input Type */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image Input Type
+                </label>
+                <div className="flex gap-4">
+                  <label>
+                    <input
+                      type="radio"
+                      name="imageInputType"
+                      value="url"
+                      checked={editForm.imageInputType === 'url'}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          imageInputType: e.target.value,
+                        })
+                      }
+                    />
+                    <span className="ml-1">Image URL</span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="imageInputType"
+                      value="upload"
+                      checked={editForm.imageInputType === 'upload'}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          imageInputType: e.target.value,
+                        })
+                      }
+                    />
+                    <span className="ml-1">Upload File</span>
+                  </label>
                 </div>
               </div>
-            ))}
+
+              {/* Images Section */}
+              <div className="mb-4">
+                {editForm.imageInputType === 'url' &&
+                  editForm.images.map((url, index) => (
+                    <div key={index} className="flex items-center gap-2 mb-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => {
+                          const updated = [...editForm.images]
+                          updated[index] = e.target.value
+                          setEditForm({ ...editForm, images: updated })
+                        }}
+                        className="w-full border border-gray-300 rounded px-2 py-1"
+                      />
+                      {editForm.images.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = editForm.images.filter(
+                              (_, i) => i !== index
+                            )
+                            setEditForm({ ...editForm, images: updated })
+                          }}
+                          className="text-red-500"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                {editForm.imageInputType === 'upload' &&
+                  editForm.uploadedImages.map((_, index) => (
+                    <input
+                      key={index}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const updated = [...editForm.uploadedImages]
+                        updated[index] = e.target.files[0]
+                        setEditForm({ ...editForm, uploadedImages: updated })
+                      }}
+                      className="w-full mb-2"
+                    />
+                  ))}
+
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 mt-2"
+                  onClick={() => {
+                    if (editForm.imageInputType === 'url') {
+                      setEditForm({
+                        ...editForm,
+                        images: [...editForm.images, ''],
+                      })
+                    } else {
+                      setEditForm({
+                        ...editForm,
+                        uploadedImages: [...editForm.uploadedImages, null],
+                      })
+                    }
+                  }}
+                >
+                  Add More Images
+                </button>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-osunblue text-white rounded-md hover:bg-blue-900"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      ))}
+      )}
     </AdminLayout>
   )
 }

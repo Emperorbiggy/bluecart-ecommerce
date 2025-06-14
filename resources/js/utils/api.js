@@ -1,4 +1,3 @@
-// resources/js/utils/api.js
 import axios from 'axios';
 
 const API_PREFIX = '/api';
@@ -9,8 +8,10 @@ export const apiRoutes = {
   me: '/me',
   profileUpdate: '/profile/update',
   permits: '/permits',
-  products: '/products', // <-- added products route
-};
+  products: '/products',
+  relatedProducts: (id) => `/products/${id}/related`, // 🔥 NEW
+}
+
 
 export const webRoutes = {
   login: '/login',
@@ -18,9 +19,9 @@ export const webRoutes = {
   dashboard: '/dashboard',
   adminDashboard: '/admin/dashboard',
   forgotPassword: '/forgot-password',
+  products: '/products',
 };
 
-// Axios instance WITH baseURL set to API_PREFIX
 const api = axios.create({
   baseURL: API_PREFIX,
   headers: {
@@ -29,7 +30,7 @@ const api = axios.create({
   },
 });
 
-// Set token to Authorization header for all future requests
+// Set Authorization token
 export const setAuthToken = (token) => {
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -38,7 +39,6 @@ export const setAuthToken = (token) => {
   }
 };
 
-// Initialize token on import if exists (auto set token on page load)
 const initToken = () => {
   const token = localStorage.getItem('auth_token');
   if (token) {
@@ -47,6 +47,7 @@ const initToken = () => {
 };
 initToken();
 
+// -------------------- AUTH --------------------
 export const login = async ({ email, password }) => {
   const response = await api.post(apiRoutes.login, { email, password });
 
@@ -58,40 +59,71 @@ export const login = async ({ email, password }) => {
   }
 
   const redirect = user?.role === 'admin' ? webRoutes.adminDashboard : webRoutes.dashboard;
-
   window.location.href = redirect;
 };
 
-// Fetch the current user info with token from api/me
 export const fetchCurrentUser = async () => {
   try {
     const response = await api.get(apiRoutes.me);
-    return response.data; // user data from backend
+    return response.data;
   } catch (error) {
     console.error('Error fetching current user:', error);
     throw error;
   }
 };
 
+// -------------------- PRODUCTS --------------------
+export const getAllProducts = async () => {
+  try {
+    const response = await api.get(apiRoutes.products);
+    const products = response.data.products;
+
+    return products.map((product) => ({
+      ...product,
+      images: typeof product.images === 'string' ? JSON.parse(product.images) : product.images,
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+};
+
+export const getRelatedProducts = async (id) => {
+  try {
+    const response = await api.get(apiRoutes.relatedProducts(id));
+    const products = response.data;
+
+    return products.map((product) => ({
+      ...product,
+      images: typeof product.images === 'string' ? JSON.parse(product.images) : product.images,
+    }));
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    throw error;
+  }
+}
+
+
+export const getProductById = async (id) => {
+  try {
+    const response = await api.get(`${apiRoutes.products}/${id}`)
+    const product = response.data.product
+
+    return {
+      ...product,
+      images: typeof product.images === 'string' ? JSON.parse(product.images) : product.images,
+    }
+  } catch (error) {
+    console.error('Error fetching product by ID:', error)
+    throw error
+  }
+}
+
+
 /**
  * Add a new product
- * Supports both URL images (JSON) and file uploads (FormData)
- * @param {Object} productData
- *   {
- *     name: string,
- *     price: number,
- *     discount?: number,
- *     category: string,
- *     shortDescription?: string,
- *     details?: string,
- *     imageInputType: 'url' | 'upload',
- *     images?: string[],            // required if imageInputType === 'url'
- *     uploadedImages?: File[],      // required if imageInputType === 'upload'
- *   }
- * @returns {Promise} axios response promise
  */
 export const addProduct = async (productData) => {
-  // Ensure token is set before request
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('No auth token found. Please log in.');
@@ -99,7 +131,6 @@ export const addProduct = async (productData) => {
   setAuthToken(token);
 
   if (productData.imageInputType === 'upload' && productData.uploadedImages?.length) {
-    // Use FormData for file uploads
     const formData = new FormData();
 
     formData.append('name', productData.name);
@@ -118,7 +149,6 @@ export const addProduct = async (productData) => {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   } else {
-    // Default: JSON request for URL images
     const payload = {
       name: productData.name,
       price: productData.price,
@@ -133,5 +163,37 @@ export const addProduct = async (productData) => {
     return api.post(apiRoutes.products, payload);
   }
 };
+
+/**
+ * Update an existing product by ID
+ * @param {string|number} id - Product ID
+ * @param {Object} data - Fields to update (name, price, category, etc.)
+ */
+export const updateProduct = async (id, data) => {
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) throw new Error('No auth token found. Please log in.')
+    setAuthToken(token)
+
+    let response
+    const isFormData = data instanceof FormData
+
+    if (isFormData) {
+      response = await api.post(`${apiRoutes.products}/${id}?_method=PUT`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+    } else {
+      response = await api.put(`${apiRoutes.products}/${id}`, data)
+    }
+
+    return response.data
+  } catch (error) {
+    console.error('Error updating product:', error)
+    throw error
+  }
+}
+
 
 export default api;

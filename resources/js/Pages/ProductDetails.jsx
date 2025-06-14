@@ -1,45 +1,33 @@
-import React, { useState } from 'react'
-import { Link } from '@inertiajs/react'
+import React, { useState, useEffect } from 'react'
+import { Link, usePage } from '@inertiajs/react'
 import AppLayout from '../Layouts/AppLayout'
-
-const sampleProduct = {
-  id: 1,
-  name: 'Wireless Earbuds',
-  price: 22000,
-  images: [
-    'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1978&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1606813902291-ffd6ae2de1f6?q=80&w=1974&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1611186871348-bdb3e516bd7e?q=80&w=1974&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1598550487035-f5a5be1f19f2?q=80&w=1974&auto=format&fit=crop',
-  ],
-  description:
-    'Experience pure audio freedom with our premium Wireless Earbuds. Featuring top-tier noise cancellation, crystal-clear sound, and a sleek, ergonomic fit — perfect for music lovers and remote professionals alike.',
-}
-
-const relatedProducts = [
-  {
-    id: 2,
-    name: 'Bluetooth Speaker',
-    price: 18000,
-    image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?q=80&w=1974&auto=format&fit=crop',
-  },
-  {
-    id: 3,
-    name: 'Headphones',
-    price: 32000,
-    image: 'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=2070&auto=format&fit=crop',
-  },
-  {
-    id: 4,
-    name: 'Power Bank',
-    price: 15000,
-    image: 'https://images.unsplash.com/photo-1745889763766-037ad5b456e2?q=80&w=1936&auto=format&fit=crop',
-  },
-]
+import { getProductById, getRelatedProducts } from '../utils/api'
 
 export default function ProductDetail() {
-  const [mainImage, setMainImage] = useState(sampleProduct.images[0])
+  const { props } = usePage()
+  const id = props.id
+
+  const [product, setProduct] = useState(null)
+  const [mainImage, setMainImage] = useState('')
   const [fadeIn, setFadeIn] = useState(true)
+  const [related, setRelated] = useState([])
+
+  useEffect(() => {
+    async function fetchProductAndRelated() {
+      try {
+        const data = await getProductById(id)
+        setProduct(data)
+        setMainImage(data.images?.[0] || '')
+
+        const relatedData = await getRelatedProducts(id)
+        setRelated(relatedData)
+      } catch (err) {
+        console.error('❌ Failed to fetch product or related', err)
+      }
+    }
+
+    if (id) fetchProductAndRelated()
+  }, [id])
 
   const changeImage = (img) => {
     setFadeIn(false)
@@ -49,9 +37,17 @@ export default function ProductDetail() {
     }, 100)
   }
 
+  if (!product) {
+    return (
+      <AppLayout>
+        <div className="py-20 text-center text-xl text-[#130447]">Loading Product...</div>
+      </AppLayout>
+    )
+  }
+
   return (
     <AppLayout>
-      {/* Product Details Card */}
+      {/* Product Details */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Image Gallery */}
@@ -59,14 +55,14 @@ export default function ProductDetail() {
             <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
               <img
                 src={mainImage}
-                alt="Main Product"
+                alt={product.name}
                 className="w-full h-[450px] object-cover rounded-xl shadow-md"
               />
             </div>
 
             {/* Thumbnails */}
             <div className="flex gap-4 mt-6 flex-wrap">
-              {sampleProduct.images.map((img, index) => (
+              {product.images.map((img, index) => (
                 <img
                   key={index}
                   src={img}
@@ -80,12 +76,15 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Details */}
+          {/* Product Info */}
           <div className="p-6 flex flex-col justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-[#130447] mb-4">{sampleProduct.name}</h1>
-              <p className="text-2xl font-semibold text-[#130447] mb-4">₦{sampleProduct.price.toLocaleString()}</p>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">{sampleProduct.description}</p>
+              <h1 className="text-4xl font-bold text-[#130447] mb-4">{product.name}</h1>
+              <p className="text-2xl font-semibold text-[#130447] mb-2">
+                ₦{Number(product.price).toLocaleString()}
+              </p>
+              <p className="text-sm text-[#130447] font-medium mb-4">Details</p>
+              <p className="text-gray-700 text-lg leading-relaxed mb-6">{product.details}</p>
             </div>
 
             <button className="mt-4 w-full md:w-auto bg-[#130447] text-white px-8 py-3 rounded-lg hover:bg-[#0f0334] transition shadow-md text-lg font-semibold">
@@ -99,24 +98,25 @@ export default function ProductDetail() {
       <section className="max-w-6xl mx-auto px-4 pb-20">
         <h2 className="text-2xl font-bold text-[#130447] mb-6">Related Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {relatedProducts.map((product) => (
+          {related.map((product) => (
             <div
               key={product.id}
               className="relative bg-white rounded-xl shadow-md overflow-hidden group transition hover:shadow-xl"
             >
               <Link href={`/products/${product.id}`}>
                 <img
-                  src={product.image}
+                  src={product.images?.[0] || 'https://via.placeholder.com/300'}
                   alt={product.name}
                   className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-semibold text-gray-900">{product.name}</h3>
-                  <p className="text-[#130447] font-bold mt-2 text-lg">₦{product.price.toLocaleString()}</p>
+                  <p className="text-[#130447] font-bold mt-2 text-lg">
+                    ₦{product.price.toLocaleString()}
+                  </p>
                 </div>
               </Link>
 
-              {/* Hover Overlay */}
               <div className="absolute inset-0 bg-[#130447]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center space-y-3">
                 <button className="px-5 py-2 bg-white text-[#130447] rounded-md font-medium hover:bg-gray-100 shadow">
                   Add to Cart
