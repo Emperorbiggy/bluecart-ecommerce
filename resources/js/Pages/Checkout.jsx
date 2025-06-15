@@ -54,42 +54,51 @@ export default function CheckoutPage() {
   }, []);
 
   const handleCheckout = async () => {
-    if (!currentUser) return alert('Please log in or register first.');
-    if (cart.length === 0) return alert('Your cart is empty.');
+  if (!currentUser) return alert('Please log in or register first.');
+  if (cart.length === 0) return alert('Your cart is empty.');
 
-    const items = cart.map(item => ({
-      product_id: item.id,
-      quantity: item.quantity,
-      price: item.price,
+  const items = cart.map(item => ({
+    product_id: item.id,
+    quantity: item.quantity,
+    price: item.price,
+  }));
+
+  try {
+    const response = await createOrder({
+      items,
+      paymentMethod,
+      vat,
+      totalPrice: total,
+    });
+
+    // Save order data to localStorage for post-payment reference
+    localStorage.setItem('checkout_order', JSON.stringify({
+      orderId: response?.order?.order_id || null,
+      userEmail: currentUser.email,
+      userPhone: currentUser.phone,
+      timestamp: Date.now(),
     }));
 
-    try {
-      const response = await createOrder({
-        items,
-        paymentMethod,
-        vat,
-        totalPrice: total,
-      });
+    if (paymentMethod === 'paystack') {
+      const paymentUrl = response?.payment_url || response?.data?.payment_url;
 
-      if (paymentMethod === 'paystack') {
-        const paymentUrl = response?.payment_url || response?.data?.payment_url;
-
-        if (paymentUrl) {
-          window.location.href = paymentUrl;
-        } else {
-          alert('Failed to redirect to Paystack.');
-          console.log('Payment URL not found in response:', response);
-        }
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
       } else {
-        setOrderId(response?.order?.order_id || 'N/A');
-        setShowSuccessModal(true);
-        clearCart();
+        alert('Failed to redirect to Paystack.');
+        console.log('Payment URL not found in response:', response);
       }
-    } catch (err) {
-      console.error(err);
-      alert('An error occurred while placing the order.');
+    } else {
+      setOrderId(response?.order?.order_id || 'N/A');
+      setShowSuccessModal(true);
+      clearCart();
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert('An error occurred while placing the order.');
+  }
+};
+
 
   if (loading) return <div className="text-center py-20">Loading checkout...</div>;
 

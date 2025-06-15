@@ -111,12 +111,14 @@ export const createOrder = async ({ items, paymentMethod, vat, totalPrice }) => 
 export async function verifyPayment(reference) {
   try {
     const response = await api.get(`${apiRoutes.payments}?reference=${reference}`);
+    console.log('✅ Payment verification response:', response);
     return response.data;
   } catch (error) {
-    console.error('Error verifying payment:', error);
+    console.error('❌ Error verifying payment:', error.response || error.message || error);
     throw error;
   }
 }
+
 
 
 // -------------------- PRODUCTS --------------------
