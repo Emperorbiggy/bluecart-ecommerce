@@ -109,7 +109,7 @@ export const createOrder = async ({ items, paymentMethod, vat, totalPrice }) => 
   return response.data;
 };
 export async function verifyPayment(reference) {
-  const res = await fetch(`/api/payments/verify?reference=${reference}`)
+  const res = await fetch(`${apiRoutes.payments}?reference=${reference}`)
   return await res.json()
 }
 
