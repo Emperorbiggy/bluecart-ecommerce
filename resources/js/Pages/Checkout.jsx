@@ -3,7 +3,6 @@ import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import { useCart } from '@/contexts/CartContext';
 import AppLayout from '../Layouts/AppLayout';
 import { fetchCurrentUser, createOrder, verifyPayment } from '@/utils/api';
-import { useSearchParams } from 'react-router-dom'; // 👈 react-router-dom v6+
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('paystack');
@@ -13,14 +12,13 @@ export default function CheckoutPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFailedModal, setShowFailedModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
-  const [searchParams] = useSearchParams(); // 👈 for detecting ?reference=
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const vat = Math.round(subtotal * 0.075);
   const total = subtotal + vat;
 
-  // Check for payment reference after Paystack redirect
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
     const reference = searchParams.get('reference');
     if (reference) {
       (async () => {
@@ -39,7 +37,7 @@ export default function CheckoutPage() {
         }
       })();
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     const getUser = async () => {
@@ -52,7 +50,6 @@ export default function CheckoutPage() {
         setLoading(false);
       }
     };
-
     getUser();
   }, []);
 
@@ -101,13 +98,10 @@ export default function CheckoutPage() {
       <h1 className="text-3xl font-bold text-[#130447] mb-10">Checkout</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left Section */}
         <div className="lg:col-span-2 bg-white p-6 shadow rounded-md">
           {!currentUser ? (
-            // Registration form here (unchanged for brevity)
             <div className="text-gray-600">Please log in to continue checkout.</div>
           ) : (
-            // Billing Details (same as before)
             <>
               <h2 className="text-xl font-semibold text-[#130447] mb-4">Billing Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -138,10 +132,8 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Right Section - Order Summary */}
         <div className="bg-white p-6 shadow rounded-md">
           <h2 className="text-xl font-bold text-[#130447] mb-4">Order Summary</h2>
-          {/* Order summary content (unchanged) */}
           <div className="space-y-3 text-gray-700">
             <div className="flex justify-between">
               <span>Subtotal</span>
