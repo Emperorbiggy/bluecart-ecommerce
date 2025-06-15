@@ -12,6 +12,7 @@ Route::middleware(['auth:api'])->group(function () {
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
 
 Route::middleware('auth:api')->get('/me', [AuthenticatedSessionController::class, 'users']);
+Route::get('/payments/verify', [OrderController::class, 'verify']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::put('/products/{id}', [ProductController::class, 'update']);

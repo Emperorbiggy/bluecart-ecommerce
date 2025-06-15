@@ -15,7 +15,6 @@ use Inertia\Inertia;
 //         'phpVersion' => PHP_VERSION,
 //     ]);
 // });
-Route::get('/payment/verify', [OrderController::class, 'verify'])->name('payments.verify');
 
 
 Route::get('/products/{id}', function ($id) {
@@ -57,7 +56,7 @@ Route::get('/cart', function () {
 });
 Route::get('/checkout', function () {
     return Inertia::render('Checkout');
-});
+})->name('payments.verify'); // 👈 This is important!
 
 
 
