@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable; // Removed HasApiTokens
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -46,14 +46,35 @@ class User extends Authenticatable implements JWTSubject
         'password' => 'hashed',
     ];
 
-    // ✅ JWT Interface Methods
+    /**
+     * JWT Identifier
+     */
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
 
+    /**
+     * JWT Custom Claims
+     */
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * Relationships
+     */
+    
+    // 🛒 User's orders
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // 💳 User's payments
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

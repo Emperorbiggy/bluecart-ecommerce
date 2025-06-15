@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
-import { getAllProducts } from '../utils/api'; // ✅ import utility
+import { getAllProducts } from '../utils/api';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import { ShoppingBag, Shirt, Headphones, Home as HomeIcon } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import {
+  ShoppingBag,
+  Shirt,
+  Headphones,
+  Home as HomeIcon,
+  ShoppingCart,
+} from 'lucide-react';
 
 const categoryIcons = {
   branded: ShoppingBag,
@@ -12,6 +19,8 @@ const categoryIcons = {
 };
 
 function ProductCard({ product }) {
+  const { addToCart, removeFromCart, getQuantity } = useCart();
+  const quantity = getQuantity(product.id);
   const image = Array.isArray(product.images) ? product.images[0] : product.image;
 
   return (
@@ -30,9 +39,30 @@ function ProductCard({ product }) {
 
       <div className="absolute inset-0 bg-[#130447]/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
         <div className="flex flex-col items-center gap-2 px-4">
-          <button className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-osunblue/30 text-sm">
-            Add to Cart
-          </button>
+          {quantity > 0 ? (
+            <div className="flex items-center gap-2 text-white">
+              <button
+                onClick={() => removeFromCart(product.id)}
+                className="bg-white/20 border border-white rounded px-3 py-1 hover:bg-red-500 hover:text-white"
+              >
+                −
+              </button>
+              <span className="font-bold">{quantity}</span>
+              <button
+                onClick={() => addToCart(product)}
+                className="bg-white/20 border border-white rounded px-3 py-1 hover:bg-green-500 hover:text-white"
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => addToCart(product)}
+              className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-osunblue/30 text-sm"
+            >
+              Add to Cart
+            </button>
+          )}
           <Link
             href={`/products/${product.id}`}
             className="text-white font-semibold bg-white/20 border border-white px-4 py-2 rounded hover:bg-osunblue/30 text-center"
@@ -48,22 +78,27 @@ function ProductCard({ product }) {
 export default function Home() {
   const [productsByCategory, setProductsByCategory] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { getTotalItems } = useCart();
 
   const heroSlides = [
     {
       title: 'Discover Endless Style',
-      description: 'Shop curated selections of fashion, gadgets, and accessories. Best prices. Fast delivery. Quality you trust.',
-      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop',
+      description:
+        'Shop curated selections of fashion, gadgets, and accessories. Best prices. Fast delivery. Quality you trust.',
+      image:
+        'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop',
     },
     {
       title: 'Tech Gadgets & Accessories',
       description: 'Explore our range of cutting-edge gadgets at unbeatable prices.',
-      image: 'https://images.unsplash.com/photo-1483181957632-8bda974cbc91?q=80&w=2070&auto=format&fit=crop',
+      image:
+        'https://images.unsplash.com/photo-1483181957632-8bda974cbc91?q=80&w=2070&auto=format&fit=crop',
     },
     {
       title: 'Stay Trendy, Stay Cool',
       description: 'Browse the latest fashion pieces tailored for you.',
-      image: 'https://images.unsplash.com/photo-1487744480471-9ca1bca6fb7d?q=80&w=2091&auto=format&fit=crop',
+      image:
+        'https://images.unsplash.com/photo-1487744480471-9ca1bca6fb7d?q=80&w=2091&auto=format&fit=crop',
     },
   ];
 
@@ -71,15 +106,12 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         const products = await getAllProducts();
-
-        // Group by category
         const grouped = products.reduce((acc, product) => {
           const cat = product.category || 'uncategorized';
           if (!acc[cat]) acc[cat] = [];
           acc[cat].push(product);
           return acc;
         }, {});
-
         setProductsByCategory(grouped);
       } catch (error) {
         console.error('Failed to load products:', error);
@@ -100,7 +132,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Existing Hero Section */}
+      {/* Hero Section */}
       <section
         className="relative w-screen h-[500px] md:h-[600px] flex items-center justify-center text-center text-white"
         style={{
@@ -122,7 +154,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Categories (dynamic) */}
+      {/* Featured Categories */}
       <section className="max-w-7xl mx-auto px-4 py-10">
         <h2 className="text-2xl font-bold text-[#130447] mb-6">Featured Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -131,7 +163,7 @@ export default function Home() {
             return (
               <Link
                 key={category}
-                href={`/category/${category}`}
+                href={`/categories/${category}`}
                 className="group rounded-xl bg-white p-6 shadow transition-all hover:shadow-xl transform hover:-translate-y-1 border border-transparent hover:border-osunblue"
               >
                 <div className="flex flex-col items-center text-center">
@@ -148,7 +180,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Product Categories */}
+      {/* Product Carousels by Category */}
       <div className="max-w-7xl mx-auto py-16 px-4 space-y-20">
         {Object.entries(productsByCategory).map(([category, items]) => (
           <div key={category}>
@@ -166,6 +198,17 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {/* ✅ Floating Cart */}
+      {getTotalItems() > 0 && (
+        <Link
+          href="/cart"
+          className="fixed bottom-6 right-6 z-50 bg-osunblue text-white p-4 rounded-full shadow-lg flex items-center gap-2 hover:bg-osunblue/90 transition"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span className="font-semibold text-sm">{getTotalItems()} item(s)</span>
+        </Link>
+      )}
     </>
   );
 }

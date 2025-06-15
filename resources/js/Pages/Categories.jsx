@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Filter, ChevronDown, ShoppingCart } from 'lucide-react'
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { getAllProducts } from '../utils/api'
 import { useCart } from '@/contexts/CartContext'
 import AppLayout from '../Layouts/AppLayout'
 
-// ✅ Reuse the same ProductCard from Home
+// ✅ Product Card Component
 function ProductCard({ product }) {
   const { addToCart, removeFromCart, getQuantity } = useCart()
   const quantity = getQuantity(product.id)
@@ -20,11 +20,8 @@ function ProductCard({ product }) {
       />
       <div className="p-4">
         <h4 className="font-semibold text-sm mb-1 truncate">{product.name}</h4>
-        <p className="text-[#130447] font-bold text-sm">
-          ₦{product.price?.toLocaleString()}
-        </p>
+        <p className="text-[#130447] font-bold text-sm">₦{product.price?.toLocaleString()}</p>
       </div>
-
       <div className="absolute inset-0 bg-[#130447]/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
         <div className="flex flex-col items-center gap-2 px-4">
           {quantity > 0 ? (
@@ -63,9 +60,13 @@ function ProductCard({ product }) {
   )
 }
 
-export default function Products() {
+// ✅ Main Page Component
+export default function CategoryPage() {
+  const { props } = usePage()
+  const initialCategory = props.initialCategory || 'all'
+
   const [products, setProducts] = useState({})
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [showDropdown, setShowDropdown] = useState(false)
   const { getTotalItems } = useCart()
 
@@ -87,6 +88,11 @@ export default function Products() {
 
     fetchProducts()
   }, [])
+
+  // Sync URL param category with dropdown selection
+  useEffect(() => {
+    setSelectedCategory(initialCategory)
+  }, [initialCategory])
 
   const categoryOptions = [
     { label: 'All Categories', value: 'all' },
@@ -123,18 +129,15 @@ export default function Products() {
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
               {categoryOptions.map((option) => (
-                <div
+                <Link
                   key={option.value}
-                  onClick={() => {
-                    setSelectedCategory(option.value)
-                    setShowDropdown(false)
-                  }}
-                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-gray-700 ${
+                  href={option.value === 'all' ? '/category/all' : `/category/${option.value}`}
+                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
                     selectedCategory === option.value ? 'font-semibold text-[#130447]' : ''
                   }`}
                 >
                   {option.label}
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -147,21 +150,10 @@ export default function Products() {
           <h2 className="text-2xl font-semibold capitalize text-gray-800 mb-6">
             {category.replace(/_/g, ' ')}
           </h2>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {items.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-
-          {/* View More */}
-          <div className="mt-6 text-center">
-            <Link
-              href={`/category/${category}`}
-              className="inline-block px-5 py-2 rounded-full text-white bg-[#130447] hover:bg-[#100338] transition font-medium"
-            >
-              View More
-            </Link>
           </div>
         </div>
       ))}
@@ -180,4 +172,4 @@ export default function Products() {
   )
 }
 
-Products.layout = (page) => <AppLayout>{page}</AppLayout>
+CategoryPage.layout = (page) => <AppLayout>{page}</AppLayout>

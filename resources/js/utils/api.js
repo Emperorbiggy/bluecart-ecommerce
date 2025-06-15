@@ -9,7 +9,9 @@ export const apiRoutes = {
   profileUpdate: '/profile/update',
   permits: '/permits',
   products: '/products',
-  relatedProducts: (id) => `/products/${id}/related`, // 🔥 NEW
+  createOrder: '/orders',
+   payments: '/payments/verify',
+  relatedProducts: (id) => `/products/${id}/related`, 
 }
 
 
@@ -63,14 +65,54 @@ export const login = async ({ email, password }) => {
 };
 
 export const fetchCurrentUser = async () => {
-  try {
-    const response = await api.get(apiRoutes.me);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching current user:', error);
-    throw error;
+  const token = localStorage.getItem('auth_token')
+
+  if (!token) {
+    throw new Error('No auth token found. Please log in.')
   }
+
+  setAuthToken(token)
+
+  try {
+    const response = await api.get(apiRoutes.me)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching current user:', error)
+    throw error
+  }
+}
+
+/**
+ * Create a new order
+ * @param {Array} items - Items from the cart
+ * @param {string} paymentMethod - 'cod' or 'paystack'
+ * @param {number} vat - VAT amount
+ * @param {number} totalPrice - Total price including VAT
+ */
+export const createOrder = async ({ items, paymentMethod, vat, totalPrice }) => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error('No auth token found. Please log in.');
+  setAuthToken(token);
+
+  const payload = {
+    items: items.map(item => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.price,
+    })),
+    total_price: totalPrice,
+    vat,
+    payment_method: paymentMethod,
+  };
+
+  const response = await api.post(apiRoutes.createOrder, payload);
+  return response.data;
 };
+export async function verifyPayment(reference) {
+  const res = await fetch(`/api/payments/verify?reference=${reference}`)
+  return await res.json()
+}
+
 
 // -------------------- PRODUCTS --------------------
 export const getAllProducts = async () => {

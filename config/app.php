@@ -54,6 +54,11 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'paystack' => [
+    'secret' => env('PAYSTACK_SECRET'),
+],
+
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -15,6 +15,8 @@ use Inertia\Inertia;
 //         'phpVersion' => PHP_VERSION,
 //     ]);
 // });
+Route::get('/payment/verify', [OrderController::class, 'verify'])->name('payments.verify');
+
 
 Route::get('/products/{id}', function ($id) {
     return Inertia::render('ProductDetails', ['id' => $id]);
@@ -22,6 +24,15 @@ Route::get('/products/{id}', function ($id) {
 Route::get('/products', function () {
     return Inertia::render('Products');
 });
+Route::get('/categories', function () {
+    return Inertia::render('Categories');
+});
+Route::get('/categories/{slug}', function ($slug) {
+    return Inertia::render('Categories', [
+        'initialCategory' => $slug
+    ]);
+});
+
 Route::get('/contact', function () {
     return Inertia::render('ContactUs');
 });
