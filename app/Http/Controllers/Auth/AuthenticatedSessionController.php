@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
 
 
 class AuthenticatedSessionController extends Controller
@@ -73,21 +74,34 @@ public function users()
     }
 }
 
-
-    /**
-     * Destroy an authenticated session.
-     */
-  public function destroy(Request $request)
+public function destroy(Request $request)
 {
-    if (!$request->user()) {
-        return response()->json(['message' => 'Unauthenticated.'], 401);
+    try {
+        $token = $request->bearerToken(); // Get token from header
+
+        Log::info('Logout request token:', ['token' => $token]); // ✅ Log token for debugging
+
+        if (!$token) {
+            return response()->json(['error' => 'Token not provided'], 401);
+        }
+
+        JWTAuth::setToken($token)->invalidate(); // Invalidate token
+
+        return response()->json([
+            'message' => 'Successfully logged out'
+        ], 200);
+
+    } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        Log::warning('TokenInvalidException during logout', ['exception' => $e]);
+        return response()->json([
+            'error' => 'Token is already invalidated or does not exist'
+        ], 401);
+    } catch (\Exception $e) {
+        Log::error('Exception during logout', ['exception' => $e]);
+        return response()->json([
+            'error' => 'Failed to logout, please try again.'
+        ], 500);
     }
-
-    Auth::guard('web')->logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return response()->json(['message' => 'Logged out successfully']);
 }
 
 

@@ -109,50 +109,58 @@ class OrderController extends Controller
     /**
      * Verify Paystack payment
      */
-    public function verify(Request $request)
-    {
-        $reference = $request->query('reference');
+    public function verify(Request $request, PaymentService $paymentService)
+{
+    $reference = $request->input('reference');
 
-        if (!$reference) {
-            return redirect('/')->with('error', 'Missing payment reference.');
-        }
-
-        $response = Http::withToken(env('PAYSTACK_SECRET_KEY'))
-            ->get("https://api.paystack.co/transaction/verify/{$reference}");
-
-        $data = $response->json();
-
-        if (!$data['status']) {
-            return redirect('/')->with('error', 'Payment verification failed.');
-        }
-
-        $orderReference = $data['data']['metadata']['order_id'] ?? null;
-
-        if (!$orderReference) {
-            return redirect('/')->with('error', 'Order reference missing in metadata.');
-        }
-
-        $order = Order::where('order_id', $orderReference)->first();
-
-        if (!$order) {
-            return redirect('/')->with('error', 'Order not found.');
-        }
-
-        $order->update([
-            'payment_status' => 'paid',
-        ]);
-
-        // Optionally record the payment
-        Payment::create([
-            'order_id'         => $order->id,
-            'reference'        => $reference,
-            'amount'           => $data['data']['amount'] / 100, // kobo to Naira
-            'channel'          => $data['data']['channel'],
-            'currency'         => $data['data']['currency'],
-            'status'           => $data['data']['status'],
-            'paid_at'          => $data['data']['paid_at'],
-        ]);
-
-        return redirect('/thank-you')->with('success', 'Payment successful!');
+    if (!$reference) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Missing payment reference.',
+        ], 400);
     }
+
+    try {
+        $result = $paymentService->verifyPaystack($reference);
+
+        if (!$result['success']) {
+            return response()->json([
+                'status' => false,
+                'message' => $result['message'] ?? 'Verification failed.',
+            ], 400);
+        }
+
+        // Get the payment and associated order
+        $payment = \App\Models\Payment::where('reference', $reference)->first();
+        $order = $payment?->order;
+
+        // ✅ If order exists and verification successful, update order status to Processing
+        if ($order) {
+            $order->update([
+                'status' => 'Processing',
+            ]);
+        }
+
+        return response()->json([
+            'status'   => 'success',
+            'message'  => $result['message'],
+            'order_id' => $order->order_id ?? null,
+            'payment'  => $payment,
+            'order'    => $order,
+        ]);
+    } catch (\Throwable $e) {
+        \Log::error('Error in payment verification controller', [
+            'reference' => $reference,
+            'error' => $e->getMessage(),
+        ]);
+
+        return response()->json([
+            'status' => false,
+            'message' => 'An error occurred during payment verification.',
+        ], 500);
+    }
+}
+
+
+
 }

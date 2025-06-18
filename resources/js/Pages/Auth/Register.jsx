@@ -1,17 +1,20 @@
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, MapPin, Phone } from 'lucide-react';
+import api, { setAuthToken, apiRoutes, webRoutes } from '@/utils/api';
 
 export default function Register() {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const togglePassword = () => setShowPassword(!showPassword);
 
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    password_confirmation: '', // ✅ renamed
     phone: '',
     address: '',
     state: '',
@@ -22,29 +25,50 @@ export default function Register() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
+
     if (step === 1) {
-      // Optional validation before moving to step 2
-      if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+      if (!form.name || !form.email || !form.password || !form.password_confirmation) {
         alert('Please fill in all personal details.');
         return;
       }
-      if (form.password !== form.confirmPassword) {
+
+      if (form.password !== form.password_confirmation) {
         alert('Passwords do not match.');
         return;
       }
+
       setStep(2);
     } else {
-      // Submit the form
-      alert('Form submitted: ' + JSON.stringify(form, null, 2));
-      // You can replace this with Inertia post call
+      try {
+        setLoading(true);
+        const response = await api.post(apiRoutes.register, form);
+        const { access_token, user } = response.data;
+
+        if (access_token) {
+          localStorage.setItem('auth_token', access_token);
+          setAuthToken(access_token);
+
+          const redirect = user?.role === 'admin' ? webRoutes.adminDashboard : webRoutes.dashboard;
+          window.location.href = redirect;
+        }
+      } catch (error) {
+        console.error('Registration failed:', error);
+        const errorMsg =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          'Registration failed. Please try again.';
+        alert(errorMsg);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
-      {/* Left Side Image */}
+      {/* Left Image */}
       <div
         className="hidden md:flex md:w-1/2 bg-cover bg-center relative"
         style={{
@@ -70,95 +94,60 @@ export default function Register() {
           <form onSubmit={handleNext} className="space-y-5">
             {step === 1 && (
               <>
-                {/* Full Name */}
-                <div className="relative">
-                  <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Full Name"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="Email Address"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                </div>
-
-                {/* Password */}
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    className="w-full pl-10 pr-10 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                  <span
-                    className="absolute right-3 top-3.5 text-gray-400 cursor-pointer"
-                    onClick={togglePassword}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </span>
-                </div>
-
-                {/* Confirm Password */}
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm Password"
-                    className="w-full pl-10 pr-10 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                </div>
+                <InputIcon
+                  icon={<User />}
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                />
+                <InputIcon
+                  icon={<Mail />}
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                />
+                <InputIcon
+                  icon={<Lock />}
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  rightIcon
+                  toggle={togglePassword}
+                  showPassword={showPassword}
+                />
+                <InputIcon
+                  icon={<Lock />}
+                  type={showPassword ? 'text' : 'password'}
+                  name="password_confirmation"
+                  value={form.password_confirmation}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                />
               </>
             )}
 
             {step === 2 && (
               <>
-                {/* Phone */}
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="Phone Number"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                </div>
-
-                {/* Address */}
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    name="address"
-                    value={form.address}
-                    onChange={handleChange}
-                    placeholder="Address"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
-                  />
-                </div>
-
-                {/* State & City */}
+                <InputIcon
+                  icon={<Phone />}
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                />
+                <InputIcon
+                  icon={<MapPin />}
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="Address"
+                />
                 <div className="flex gap-4">
                   <input
                     type="text"
@@ -180,12 +169,12 @@ export default function Register() {
               </>
             )}
 
-            {/* Submit/Next Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-osunblue text-white py-3 rounded-lg hover:bg-osunblue-700 transition font-semibold"
             >
-              {step === 1 ? 'Next' : 'Register'}
+              {loading ? 'Submitting...' : step === 1 ? 'Next' : 'Register'}
             </button>
           </form>
 
@@ -197,6 +186,23 @@ export default function Register() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function InputIcon({ icon, rightIcon, showPassword, toggle, ...props }) {
+  return (
+    <div className="relative">
+      <span className="absolute left-3 top-3.5 text-gray-400">{icon}</span>
+      <input
+        {...props}
+        className="w-full pl-10 pr-10 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-osunblue focus:outline-none"
+      />
+      {rightIcon && (
+        <span className="absolute right-3 top-3.5 text-gray-400 cursor-pointer" onClick={toggle}>
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </span>
+      )}
     </div>
   );
 }

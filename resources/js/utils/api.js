@@ -11,6 +11,8 @@ export const apiRoutes = {
   products: '/products',
   createOrder: '/orders',
    payments: '/payments/verify',
+   register: '/register',
+   getOrders: '/orders',
   relatedProducts: (id) => `/products/${id}/related`, 
 }
 
@@ -81,6 +83,15 @@ export const fetchCurrentUser = async () => {
     throw error
   }
 }
+export const getMyOrders = async () => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error('No auth token found.');
+  setAuthToken(token);
+
+  const response = await api.get(apiRoutes.getOrders);
+  return response.data.orders;
+};
+
 
 /**
  * Create a new order
@@ -110,7 +121,9 @@ export const createOrder = async ({ items, paymentMethod, vat, totalPrice }) => 
 };
 export async function verifyPayment(reference) {
   try {
-    const response = await api.get(`${apiRoutes.payments}?reference=${reference}`);
+    const response = await api.post(apiRoutes.payments, {
+      reference,
+    });
     console.log('✅ Payment verification response:', response);
     return response.data;
   } catch (error) {
@@ -118,6 +131,7 @@ export async function verifyPayment(reference) {
     throw error;
   }
 }
+
 
 
 
@@ -243,6 +257,20 @@ export const updateProduct = async (id, data) => {
     throw error
   }
 }
+export const register = async (form) => {
+  const response = await api.post(apiRoutes.register, form);
+
+  const { access_token, user } = response.data;
+
+  if (access_token) {
+    localStorage.setItem('auth_token', access_token);
+    setAuthToken(access_token);
+  }
+
+  const redirect = user?.role === 'admin' ? webRoutes.adminDashboard : webRoutes.dashboard;
+  window.location.href = redirect;
+};
+
 
 
 export default api;

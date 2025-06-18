@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { Link, router } from '@inertiajs/react'
-import { User, ShoppingCart, CreditCard, PackageCheck, LogOut } from 'lucide-react'
+import { Link } from '@inertiajs/react'
+import {
+  User,
+  ShoppingCart,
+  CreditCard,
+  PackageCheck,
+  LogOut,
+} from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import AppLayout from '../Layouts/AppLayout'
-import { fetchCurrentUser } from '@/utils/api'
+import { fetchCurrentUser, getMyOrders } from '@/utils/api'
+import axios from 'axios'
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
   const [currentUser, setCurrentUser] = useState(null)
   const [loadingUser, setLoadingUser] = useState(true)
+  const [orders, setOrders] = useState([])
+  const [loadingOrders, setLoadingOrders] = useState(true)
 
-  const { cart, addToCart, removeFromCart } = useCart()
+  const { cart } = useCart()
 
   const tabs = [
     { key: 'profile', label: 'Profile', icon: <User size={18} /> },
@@ -20,20 +29,36 @@ export default function UserDashboard() {
     { key: 'logout', label: 'Logout', icon: <LogOut size={18} /> },
   ]
 
-  const handleLogout = () => router.post(route('logout'))
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      await axios.post('/api/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      localStorage.removeItem('auth_token')
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Logout failed', error)
+    }
+  }
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUserAndOrders = async () => {
       try {
         const { user } = await fetchCurrentUser()
         setCurrentUser(user)
+        const orders = await getMyOrders()
+        setOrders(orders)
       } catch {
         setCurrentUser(null)
       } finally {
         setLoadingUser(false)
+        setLoadingOrders(false)
       }
     }
-    loadUser()
+    loadUserAndOrders()
   }, [])
 
   if (loadingUser) {
@@ -119,12 +144,82 @@ export default function UserDashboard() {
         )
 
       case 'orders':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#130447]">Order History</h2>
-            <p className="text-gray-500">You have no past orders yet.</p>
-          </div>
-        )
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-[#130447]">Order History</h2>
+
+      {loadingOrders ? (
+        <p>Loading orders...</p>
+      ) : orders.length === 0 ? (
+        <p className="text-gray-500">You have no past orders yet.</p>
+      ) : (
+        <div className="space-y-6">
+          {orders.map(order => (
+            <div
+              key={order.id}
+              className="border rounded-lg shadow-sm p-6 bg-gray-50"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#130447] mb-1">
+                    Order #{order.order_id}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Total: ₦{Number(order.total_price).toLocaleString()} &nbsp;|&nbsp; VAT: ₦
+                    {Number(order.vat).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex gap-2 text-sm">
+                  <span
+                    className={`px-2 py-1 rounded-full ${
+                      order.payment_status === 'paid'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {order.payment_status.toUpperCase()}
+                  </span>
+                  <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                    {order.payment_method.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead>
+                    <tr className="text-gray-700 border-b">
+                      <th className="py-2 pr-4">Product</th>
+                      <th className="py-2 pr-4">Qty</th>
+                      <th className="py-2 pr-4">Price</th>
+                      <th className="py-2">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.items.map(item => (
+                      <tr key={item.id} className="border-b text-gray-600">
+                        <td className="py-2 pr-4">
+                          {item.product?.name || 'Product'}
+                        </td>
+                        <td className="py-2 pr-4">{item.quantity}</td>
+                        <td className="py-2 pr-4">
+                          ₦{Number(item.unit_price).toLocaleString()}
+                        </td>
+                        <td className="py-2">
+                          ₦{Number(item.total_price).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+
 
       case 'logout':
         handleLogout()
@@ -175,5 +270,4 @@ export default function UserDashboard() {
   )
 }
 
-// ✅ Wrap with AppLayout using Inertia's page layout feature
 UserDashboard.layout = (page) => <AppLayout>{page}</AppLayout>

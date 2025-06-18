@@ -4,12 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\OrderController;
 
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
 });
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
+Route::middleware('auth:api')->post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
 
 Route::middleware('auth:api')->get('/me', [AuthenticatedSessionController::class, 'users']);
 Route::post('/payments/verify', [OrderController::class, 'verify']);

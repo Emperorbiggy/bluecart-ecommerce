@@ -18,26 +18,39 @@ export default function CheckoutPage() {
   const total = subtotal + vat;
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const reference = searchParams.get('reference');
-    if (reference) {
-      (async () => {
-        try {
-          const result = await verifyPayment(reference);
-          if (result.status === 'success') {
-            setOrderId(result.order_id || 'N/A');
-            setShowSuccessModal(true);
-            clearCart();
-          } else {
-            setShowFailedModal(true);
-          }
-        } catch (err) {
-          console.error('Payment verification failed:', err);
+  const searchParams = new URLSearchParams(window.location.search);
+  const reference = searchParams.get('reference');
+
+  if (reference) {
+    (async () => {
+      try {
+        const result = await verifyPayment(reference);
+        const localOrder = JSON.parse(localStorage.getItem('checkout_order'));
+
+        console.log('🔍 Local Order Info:', localOrder);
+        console.log('📦 Server Verification Result:', result);
+
+        if (result.status === 'success') {
+          setOrderId(localOrder?.orderId || result.order_id || 'N/A');
+          setShowSuccessModal(true);
+          clearCart();
+
+          // Optionally show other data: amount, email, etc.
+          // console.log('Paid:', localOrder?.amount, 'Email:', localOrder?.userEmail);
+
+          // Clean up
+          localStorage.removeItem('checkout_order');
+        } else {
           setShowFailedModal(true);
         }
-      })();
-    }
-  }, []);
+      } catch (err) {
+        console.error('Payment verification failed:', err);
+        setShowFailedModal(true);
+      }
+    })();
+  }
+}, []);
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -52,8 +65,7 @@ export default function CheckoutPage() {
     };
     getUser();
   }, []);
-
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
   if (!currentUser) return alert('Please log in or register first.');
   if (cart.length === 0) return alert('Your cart is empty.');
 
@@ -71,17 +83,21 @@ export default function CheckoutPage() {
       totalPrice: total,
     });
 
-    // Save order data to localStorage for post-payment reference
+    const order = response?.order;
+    const payment = response?.payment;
+
+    // Save key data for use after Paystack redirects back
     localStorage.setItem('checkout_order', JSON.stringify({
-      orderId: response?.order?.order_id || null,
+      orderId: order?.order_id || null,
+      reference: payment?.reference || null,
       userEmail: currentUser.email,
       userPhone: currentUser.phone,
+      amount: payment?.amount || total,
       timestamp: Date.now(),
     }));
 
     if (paymentMethod === 'paystack') {
-      const paymentUrl = response?.payment_url || response?.data?.payment_url;
-
+      const paymentUrl = response?.payment_url;
       if (paymentUrl) {
         window.location.href = paymentUrl;
       } else {
@@ -89,7 +105,7 @@ export default function CheckoutPage() {
         console.log('Payment URL not found in response:', response);
       }
     } else {
-      setOrderId(response?.order?.order_id || 'N/A');
+      setOrderId(order?.order_id || 'N/A');
       setShowSuccessModal(true);
       clearCart();
     }
@@ -98,6 +114,7 @@ export default function CheckoutPage() {
     alert('An error occurred while placing the order.');
   }
 };
+
 
 
   if (loading) return <div className="text-center py-20">Loading checkout...</div>;
