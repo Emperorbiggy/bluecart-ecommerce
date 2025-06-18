@@ -1,6 +1,6 @@
 // AdminSidebar.jsx
 
-import { Link, usePage } from '@inertiajs/react'
+import { Link, usePage, router } from '@inertiajs/react'
 import {
   Menu,
   X,
@@ -10,6 +10,7 @@ import {
   ClipboardList,
   User,
   CreditCard,
+  LogOut,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -25,6 +26,10 @@ const nav = [
 export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const { url } = usePage()
+
+  const handleLogout = () => {
+    router.post('/logout')
+  }
 
   return (
     <>
@@ -42,10 +47,11 @@ export default function AdminSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-white z-40 shadow-md h-full fixed top-0 left-0 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 md:fixed md:top-0 md:left-0 md:h-screen`}
-      >
+  className={`w-64 bg-white z-40 shadow-md h-full fixed left-0 transform transition-transform duration-300 ease-in-out pt-[64px] md:pt-0 ${
+    isOpen ? 'translate-x-0' : '-translate-x-full'
+  } md:translate-x-0 md:fixed md:top-0 md:left-0 md:h-screen flex flex-col`}
+>
+
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b">
           <Link href="/" className="flex items-center gap-2">
@@ -74,6 +80,17 @@ export default function AdminSidebar() {
             </Link>
           ))}
         </nav>
+
+        {/* Logout Button at the Bottom */}
+        <div className="border-t px-4 py-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-2 w-full text-left rounded-lg text-red-600 hover:bg-gray-100 transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
       </aside>
 
       {/* Mobile Overlay */}
