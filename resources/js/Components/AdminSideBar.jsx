@@ -8,7 +8,6 @@ import {
   Box,
   PlusCircle,
   ClipboardList,
-  CheckCircle,
   User,
   CreditCard,
 } from 'lucide-react'
@@ -19,7 +18,7 @@ const nav = [
   { key: 'all-products', label: 'All Products', icon: Box, href: '/admin/products' },
   { key: 'add-product', label: 'Add Product', icon: PlusCircle, href: '/admin/create/product' },
   { key: 'orders', label: 'Orders', icon: ClipboardList, href: '/admin/orders' },
-  { key: 'payments', label: 'Payments', icon: CreditCard, href: '/admin/payments' }, // ✅ Added
+  { key: 'payments', label: 'Payments', icon: CreditCard, href: '/admin/payments' },
   { key: 'profile', label: 'Profile', icon: User, href: '/admin/profile' },
 ]
 
@@ -34,10 +33,10 @@ export default function AdminSidebar() {
         <button onClick={() => setIsOpen(true)} className="text-gray-700">
           <Menu className="w-6 h-6" />
         </button>
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <ShoppingCart className="text-osunblue w-6 h-6" />
           <h1 className="text-lg font-bold text-osunblue">BlueCart</h1>
-        </div>
+        </Link>
         <div className="w-6 h-6" />
       </div>
 
@@ -49,10 +48,10 @@ export default function AdminSidebar() {
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <ShoppingCart className="text-osunblue w-6 h-6" />
             <h1 className="text-xl font-bold text-osunblue">BlueCart</h1>
-          </div>
+          </Link>
           <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-700">
             <X className="w-6 h-6" />
           </button>

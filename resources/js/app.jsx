@@ -8,18 +8,18 @@ import { Inertia } from '@inertiajs/inertia'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
-// ✅ Log token from localStorage
-Inertia.on('before', (event) => {
-  const token = localStorage.getItem('token')
-  console.log('🧪 Token from localStorage:', token)
+// // ✅ Log token from localStorage
+// Inertia.on('before', (event) => {
+//   const token = localStorage.getItem('token')
+//   console.log('🧪 Token from localStorage:', token)
 
-  if (token) {
-    event.detail.visit.headers = {
-      ...event.detail.visit.headers,
-      Authorization: `Bearer ${token}`,
-    }
-  }
-})
+//   if (token) {
+//     event.detail.visit.headers = {
+//       ...event.detail.visit.headers,
+//       Authorization: `Bearer ${token}`,
+//     }
+//   }
+// })
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,

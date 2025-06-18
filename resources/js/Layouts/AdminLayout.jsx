@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { router } from '@inertiajs/react'
 import AdminSidebar from '../components/AdminSidebar'
 import { getUserRole } from '@/utils/api'
+import BlueCartLoader from '@/Components/BlueCartLoader' // ✅ import loader
 
 export default function AdminLayout({ children }) {
   const [loading, setLoading] = useState(true)
@@ -30,8 +31,8 @@ export default function AdminLayout({ children }) {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <p className="text-gray-600">Checking permissions...</p>
+      <div className="h-screen flex items-center justify-center bg-white">
+        <BlueCartLoader />
       </div>
     )
   }
