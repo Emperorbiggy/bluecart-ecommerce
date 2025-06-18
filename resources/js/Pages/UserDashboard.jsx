@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext'
 import AppLayout from '../Layouts/AppLayout'
 import { fetchCurrentUser, getMyOrders } from '@/utils/api'
 import axios from 'axios'
+import BlueCartLoader from '@/components/BlueCartLoader' // ✅ import loader
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
@@ -62,10 +63,10 @@ export default function UserDashboard() {
   }, [])
 
   if (loadingUser) {
-    return <div className="py-20 text-center">Loading dashboard...</div>
+    return <BlueCartLoader /> // ✅ loader used during user fetch
   }
 
-  const renderContent = () => {
+const renderContent = () => {
     switch (activeTab) {
       case 'profile':
         return (
@@ -281,3 +282,4 @@ export default function UserDashboard() {
 }
 
 UserDashboard.layout = (page) => <AppLayout>{page}</AppLayout>
+
