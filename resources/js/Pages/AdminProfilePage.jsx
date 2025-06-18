@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '../Layouts/AdminLayout'
-import { fetchCurrentUser } from '../utils/api'  // adjust path if needed
+import { fetchCurrentUser } from '../utils/api'
+import axios from 'axios'
 
 export default function AdminProfilePage() {
   const [activeTab, setActiveTab] = useState('profile')
@@ -17,18 +18,18 @@ export default function AdminProfilePage() {
     confirmPassword: '',
   })
 
+  const [loading, setLoading] = useState(false)
+
   // Fetch user data on mount
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userData = await fetchCurrentUser()
-const user = userData.user  // unwrap here
-setForm({
-  name: user.name || '',
-  email: user.email || '',
-  phone: user.phone || '',
-})
-
+        const { user } = await fetchCurrentUser()
+        setForm({
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+        })
       } catch (error) {
         console.error('Failed to load user:', error)
       }
@@ -45,19 +46,58 @@ setForm({
     setPasswords({ ...passwords, [e.target.name]: e.target.value })
   }
 
-  const updateProfile = () => {
-    alert('Profile Updated ✅ (Demo only)')
-    // Here you can call your API to update the profile
+  const updateProfile = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await axios.post('/api/update-profile', form, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      alert(response.data.message || 'Profile updated successfully ✅')
+    } catch (error) {
+      console.error(error)
+      alert('Failed to update profile ')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const changePassword = () => {
+  const changePassword = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) {
-      alert('New passwords do not match ❌')
+      alert('New passwords do not match ')
       return
     }
 
-    alert('Password Changed ✅ (Demo only)')
-    // Here you can call your API to change the password
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await axios.post(
+        '/api/change-password',
+        {
+          old_password: passwords.oldPassword,
+          new_password: passwords.newPassword,
+          new_password_confirmation: passwords.confirmPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      alert(response.data.message || 'Password changed successfully ✅')
+      setPasswords({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      })
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        const firstError = Object.values(error.response.data.errors)[0][0]
+        alert(firstError)
+      } else {
+        alert('Failed to change password ❌')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -103,9 +143,10 @@ setForm({
 
           <button
             onClick={updateProfile}
-            className="mt-6 px-6 py-2 bg-[#130447] text-white rounded hover:bg-[#10033c]"
+            disabled={loading}
+            className="mt-6 px-6 py-2 bg-[#130447] text-white rounded hover:bg-[#10033c] disabled:opacity-50"
           >
-            Update Profile
+            {loading ? 'Updating...' : 'Update Profile'}
           </button>
         </div>
 
@@ -147,9 +188,10 @@ setForm({
 
           <button
             onClick={changePassword}
-            className="mt-6 px-6 py-2 bg-[#130447] text-white rounded hover:bg-[#10033c]"
+            disabled={loading}
+            className="mt-6 px-6 py-2 bg-[#130447] text-white rounded hover:bg-[#10033c] disabled:opacity-50"
           >
-            Change Password
+            {loading ? 'Changing...' : 'Change Password'}
           </button>
         </div>
       </div>
