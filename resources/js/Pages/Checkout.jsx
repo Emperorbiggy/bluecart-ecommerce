@@ -3,11 +3,13 @@ import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import { useCart } from '@/contexts/CartContext';
 import AppLayout from '../Layouts/AppLayout';
 import { fetchCurrentUser, createOrder, verifyPayment } from '@/utils/api';
+import BlueCartLoader from '@/components/BlueCartLoader'; // ✅ Import loader
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('paystack');
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false); // ✅ New loading state
   const { cart, clearCart } = useCart();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFailedModal, setShowFailedModal] = useState(false);
@@ -18,39 +20,30 @@ export default function CheckoutPage() {
   const total = subtotal + vat;
 
   useEffect(() => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const reference = searchParams.get('reference');
+    const searchParams = new URLSearchParams(window.location.search);
+    const reference = searchParams.get('reference');
 
-  if (reference) {
-    (async () => {
-      try {
-        const result = await verifyPayment(reference);
-        const localOrder = JSON.parse(localStorage.getItem('checkout_order'));
+    if (reference) {
+      (async () => {
+        try {
+          const result = await verifyPayment(reference);
+          const localOrder = JSON.parse(localStorage.getItem('checkout_order'));
 
-        console.log('🔍 Local Order Info:', localOrder);
-        console.log('📦 Server Verification Result:', result);
-
-        if (result.status === 'success') {
-          setOrderId(localOrder?.orderId || result.order_id || 'N/A');
-          setShowSuccessModal(true);
-          clearCart();
-
-          // Optionally show other data: amount, email, etc.
-          // console.log('Paid:', localOrder?.amount, 'Email:', localOrder?.userEmail);
-
-          // Clean up
-          localStorage.removeItem('checkout_order');
-        } else {
+          if (result.status === 'success') {
+            setOrderId(localOrder?.orderId || result.order_id || 'N/A');
+            setShowSuccessModal(true);
+            clearCart();
+            localStorage.removeItem('checkout_order');
+          } else {
+            setShowFailedModal(true);
+          }
+        } catch (err) {
+          console.error('Payment verification failed:', err);
           setShowFailedModal(true);
         }
-      } catch (err) {
-        console.error('Payment verification failed:', err);
-        setShowFailedModal(true);
-      }
-    })();
-  }
-}, []);
-
+      })();
+    }
+  }, []);
 
   useEffect(() => {
     const getUser = async () => {
@@ -65,59 +58,60 @@ export default function CheckoutPage() {
     };
     getUser();
   }, []);
-const handleCheckout = async () => {
-  if (!currentUser) return alert('Please log in or register first.');
-  if (cart.length === 0) return alert('Your cart is empty.');
 
-  const items = cart.map(item => ({
-    product_id: item.id,
-    quantity: item.quantity,
-    price: item.price,
-  }));
+  const handleCheckout = async () => {
+    if (!currentUser) return alert('Please log in or register first.');
+    if (cart.length === 0) return alert('Your cart is empty.');
 
-  try {
-    const response = await createOrder({
-      items,
-      paymentMethod,
-      vat,
-      totalPrice: total,
-    });
+    setIsCheckingOut(true); // ✅ Show loader
 
-    const order = response?.order;
-    const payment = response?.payment;
-
-    // Save key data for use after Paystack redirects back
-    localStorage.setItem('checkout_order', JSON.stringify({
-      orderId: order?.order_id || null,
-      reference: payment?.reference || null,
-      userEmail: currentUser.email,
-      userPhone: currentUser.phone,
-      amount: payment?.amount || total,
-      timestamp: Date.now(),
+    const items = cart.map(item => ({
+      product_id: item.id,
+      quantity: item.quantity,
+      price: item.price,
     }));
 
-    if (paymentMethod === 'paystack') {
-      const paymentUrl = response?.payment_url;
-      if (paymentUrl) {
-        window.location.href = paymentUrl;
+    try {
+      const response = await createOrder({
+        items,
+        paymentMethod,
+        vat,
+        totalPrice: total,
+      });
+
+      const order = response?.order;
+      const payment = response?.payment;
+
+      localStorage.setItem('checkout_order', JSON.stringify({
+        orderId: order?.order_id || null,
+        reference: payment?.reference || null,
+        userEmail: currentUser.email,
+        userPhone: currentUser.phone,
+        amount: payment?.amount || total,
+        timestamp: Date.now(),
+      }));
+
+      if (paymentMethod === 'paystack') {
+        const paymentUrl = response?.payment_url;
+        if (paymentUrl) {
+          window.location.href = paymentUrl;
+        } else {
+          alert('Failed to redirect to Paystack.');
+        }
       } else {
-        alert('Failed to redirect to Paystack.');
-        console.log('Payment URL not found in response:', response);
+        setOrderId(order?.order_id || 'N/A');
+        setShowSuccessModal(true);
+        clearCart();
       }
-    } else {
-      setOrderId(order?.order_id || 'N/A');
-      setShowSuccessModal(true);
-      clearCart();
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred while placing the order.');
+    } finally {
+      setIsCheckingOut(false); // ✅ Hide loader (only visible if no redirect)
     }
-  } catch (err) {
-    console.error(err);
-    alert('An error occurred while placing the order.');
-  }
-};
+  };
 
-
-
-  if (loading) return <div className="text-center py-20">Loading checkout...</div>;
+  if (loading || isCheckingOut) return <BlueCartLoader />; // ✅ Show loader during init or checkout
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-16">
