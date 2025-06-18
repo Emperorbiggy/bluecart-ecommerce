@@ -1,6 +1,7 @@
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import AdminLayout from '../Layouts/AdminLayout'
-import React, { useState, useEffect } from 'react';
-import { fetchCurrentUser } from '@/utils/api';
+import { fetchCurrentUser, getAllProducts } from '@/utils/api'
 import {
   ShoppingBag,
   ClipboardList,
@@ -30,44 +31,79 @@ ChartJS.register(
 )
 
 export default function AdminDashboard() {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // optional loading state
-  const [error, setError] = useState(null);     // optional error state
-  const stats = {
-    products: 124,
-    pending: 8,
-    complete: 56,
-  }
+  const [user, setUser] = useState(null)
+  const [products, setProducts] = useState([])
+  const [orders, setOrders] = useState([])
+  const [payments, setPayments] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+
+        // User
+        const userData = await fetchCurrentUser()
+        setUser(userData)
+
+        // Products
+        const productData = await getAllProducts()
+        const parsed = productData.map(product => ({
+          ...product,
+          images: typeof product.images === 'string' ? JSON.parse(product.images) : product.images,
+        }))
+        setProducts(parsed)
+
+        // Orders
+        const token = localStorage.getItem('auth_token')
+        const orderRes = await axios.get('/api/admin/orders', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setOrders(orderRes.data.orders)
+
+        // Payments
+        const paymentRes = await axios.get('/api/payments', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setPayments(paymentRes.data.payments)
+      } catch (error) {
+        console.error('Dashboard data fetch failed', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Stats
+  const totalProducts = products.length
+  const pendingOrders = orders.filter(o =>
+    ['Pending', 'Processing'].includes(o.status)
+  ).length
+  const completeOrders = orders.filter(o => o.status === 'completed').length
+
+  // Prepare weekly sales chart data from payments
+  const salesByWeek = Array(5).fill(0) // 4 weeks + buffer
+
+  payments.forEach(payment => {
+    const date = new Date(payment.date || payment.created_at)
+    const week = Math.ceil(date.getDate() / 7)
+    salesByWeek[week - 1] += Number(payment.amount || 0)
+  })
 
   const chartData = {
     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
     datasets: [
       {
-        label: 'Sales',
-        data: [12, 19, 8, 25],
+        label: 'Sales (₦)',
+        data: salesByWeek.slice(0, 4),
         borderColor: '#130447',
         backgroundColor: 'rgba(19, 4, 71, 0.2)',
         tension: 0.4,
       },
     ],
   }
-  useEffect(() => {
-    async function getUserData() {
-      try {
-        setLoading(true);
-        const userData = await fetchCurrentUser();
-        setUser(userData);
-        setError(null);
-      } catch (err) {
-        setError('Failed to fetch user data.');
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    getUserData();
-  }, []);
 
   return (
     <AdminLayout>
@@ -76,14 +112,14 @@ export default function AdminDashboard() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card icon={ShoppingBag} label="Products" count={stats.products} />
-          <Card icon={ClipboardList} label="Pending Orders" count={stats.pending} />
-          <Card icon={CheckCircle} label="Complete Orders" count={stats.complete} />
+          <Card icon={ShoppingBag} label="Products" count={totalProducts} />
+          <Card icon={ClipboardList} label="Pending Orders" count={pendingOrders} />
+          <Card icon={CheckCircle} label="Complete Orders" count={completeOrders} />
         </div>
 
         {/* Chart */}
         <div className="bg-white rounded-lg shadow p-6 w-full max-w-4xl mx-auto">
-          <h4 className="text-lg font-semibold mb-4">Sales Overview</h4>
+          <h4 className="text-lg font-semibold mb-4">Sales Overview (This Month)</h4>
           <div className="h-64">
             <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>

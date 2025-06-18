@@ -169,20 +169,30 @@ export default function UserDashboard() {
                     {Number(order.vat).toLocaleString()}
                   </p>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      order.payment_status === 'paid'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                  >
-                    {order.payment_status.toUpperCase()}
-                  </span>
-                  <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                    {order.payment_method.toUpperCase()}
-                  </span>
-                </div>
+                <div className="flex flex-wrap gap-2 text-sm">
+  <span className={`px-2 py-1 rounded-full ${
+    order.payment_status === 'paid'
+      ? 'bg-green-100 text-green-800'
+      : 'bg-yellow-100 text-yellow-800'
+  }`}>
+    {order.payment_status.toUpperCase()}
+  </span>
+
+  <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+    {order.payment_method.toUpperCase()}
+  </span>
+
+  <span className={`px-2 py-1 rounded-full ${
+    order.status === 'completed'
+      ? 'bg-green-200 text-green-900'
+      : order.status === 'processing'
+      ? 'bg-yellow-200 text-yellow-900'
+      : 'bg-red-100 text-red-800'
+  }`}>
+    {order.status?.toUpperCase() || 'PENDING'}
+  </span>
+</div>
+
               </div>
 
               <div className="mt-4 overflow-x-auto">

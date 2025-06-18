@@ -15,7 +15,8 @@ class Order extends Model
     'total_price',
     'vat',
     'payment_status',
-    'payment_method', // 👈 Add this
+    'payment_method',
+    'status', // ✅ Add this
 ];
 
 

@@ -47,6 +47,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/products', fn () => Inertia::render('AllProducts'))->name('admin.products');
     Route::get('/create/product', fn () => Inertia::render('AddProduct'))->name('admin.products.create');
     Route::get('/orders', fn () => Inertia::render('Orders'))->name('admin.orders');
+    Route::get('/payments', fn () => Inertia::render('PaymentsPage'))->name('admin.payments');
     Route::get('/profile', fn () => Inertia::render('AdminProfilePage'))->name('admin.profile');
 });
 

@@ -13,6 +13,8 @@ export const apiRoutes = {
    payments: '/payments/verify',
    register: '/register',
    getOrders: '/orders',
+    checkRole: '/user/role', 
+    
   relatedProducts: (id) => `/products/${id}/related`, 
 }
 
@@ -92,6 +94,23 @@ export const getMyOrders = async () => {
   return response.data.orders;
 };
 
+/**
+ * Get current user's role (admin/user)
+ * @returns {Promise<{ role: string, is_admin: boolean }>}
+ */
+export const getUserRole = async () => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error('No auth token found. Please log in.');
+  setAuthToken(token);
+
+  try {
+    const response = await api.get(apiRoutes.checkRole);
+    return response.data; // { role: 'admin', is_admin: true }
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    throw error;
+  }
+};
 
 /**
  * Create a new order

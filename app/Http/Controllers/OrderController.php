@@ -160,7 +160,76 @@ class OrderController extends Controller
         ], 500);
     }
 }
+public function allOrders()
+{
+    $orders = \App\Models\Order::with(['user', 'items.product'])->latest()->get();
 
+    return response()->json([
+        'success' => true,
+        'orders' => $orders,
+    ]);
+}
+public function updateStatus(Request $request, $orderId)
+{
+    // Validate status field
+    $request->validate([
+        'status' => 'required|string|in:pending,processing,completed,rejected,approved,refunded',
+    ]);
+
+    // Find the order by ID
+    $order = Order::findOrFail($orderId);
+
+    // Update the order status
+    $order->status = $request->status;
+
+    // If status is 'completed' and payment method is COD
+    if ($request->status === 'completed' && $order->payment_method === 'cod') {
+        // Update related payment status
+        $payment = $order->payment; // Assumes you have $order->payment() relationship
+        if ($payment) {
+            $payment->status = 'completed';
+            $payment->save();
+        }
+
+        // Also mark the order's payment_status as paid
+        $order->payment_status = 'paid';
+    }
+
+    // Save the updated order
+    $order->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Order status updated successfully.',
+        'order' => $order->load('items', 'user', 'payment'), // preload if needed
+    ]);
+}
+
+
+public function all()
+{
+    $payments = \App\Models\Payment::with(['user:id,name', 'order:id,order_id'])
+    ->latest()
+    ->get()
+    ->map(function ($payment) {
+        return [
+            'id'         => $payment->id,
+            'reference'  => $payment->reference,
+            'amount'     => $payment->amount,
+            'status'     => $payment->status,
+            'method'     => $payment->method,
+            'date'       => $payment->created_at->toDateTimeString(),
+            'user_name'  => $payment->user->name ?? 'Unknown',
+            'order_id'   => $payment->order->order_id ?? 'N/A',
+        ];
+    });
+
+
+    return response()->json([
+        'success'  => true,
+        'payments' => $payments,
+    ]);
+}
 
 
 }

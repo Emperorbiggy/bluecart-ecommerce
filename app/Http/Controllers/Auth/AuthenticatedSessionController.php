@@ -73,6 +73,27 @@ public function users()
         return response()->json(['error' => 'Token absent'], 401);
     }
 }
+public function checkRole(Request $request)
+{
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'role' => $user->role,
+            'is_admin' => $user->role === 'admin',
+        ]);
+    } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        return response()->json(['error' => 'Token expired'], 401);
+    } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        return response()->json(['error' => 'Token invalid'], 401);
+    } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+        return response()->json(['error' => 'Token absent'], 401);
+    }
+}
 
 public function destroy(Request $request)
 {

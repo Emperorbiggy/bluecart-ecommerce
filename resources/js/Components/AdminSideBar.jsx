@@ -10,6 +10,7 @@ import {
   ClipboardList,
   CheckCircle,
   User,
+  CreditCard,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -18,6 +19,7 @@ const nav = [
   { key: 'all-products', label: 'All Products', icon: Box, href: '/admin/products' },
   { key: 'add-product', label: 'Add Product', icon: PlusCircle, href: '/admin/create/product' },
   { key: 'orders', label: 'Orders', icon: ClipboardList, href: '/admin/orders' },
+  { key: 'payments', label: 'Payments', icon: CreditCard, href: '/admin/payments' }, // ✅ Added
   { key: 'profile', label: 'Profile', icon: User, href: '/admin/profile' },
 ]
 
@@ -41,7 +43,9 @@ export default function AdminSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-white z-40 shadow-md h-full fixed top-0 left-0 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:fixed md:top-0 md:left-0 md:h-screen`}
+        className={`w-64 bg-white z-40 shadow-md h-full fixed top-0 left-0 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0 md:fixed md:top-0 md:left-0 md:h-screen`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b">
@@ -75,7 +79,10 @@ export default function AdminSidebar() {
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden" onClick={() => setIsOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
       )}
     </>
   )
