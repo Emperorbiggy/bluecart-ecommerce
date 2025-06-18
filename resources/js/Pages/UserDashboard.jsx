@@ -84,6 +84,10 @@ export default function UserDashboard() {
                 <label className="block font-medium text-gray-700">Email Address</label>
                 <input type="email" value={currentUser?.email || ''} disabled className="w-full border rounded-md p-2 bg-gray-100" />
               </div>
+              <div>
+                <label className="block font-medium text-gray-700">Phone Number</label>
+                <input type="email" value={currentUser?.phone || ''} disabled className="w-full border rounded-md p-2 bg-gray-100" />
+              </div>
             </div>
           </div>
         )
