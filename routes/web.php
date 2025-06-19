@@ -57,7 +57,7 @@ Route::get('/cart', function () {
 });
 Route::get('/checkout', function () {
     return Inertia::render('Checkout');
-})->name('payments.verify'); // 👈 This is important!
+})->name('payments.verify'); 
 
 
 

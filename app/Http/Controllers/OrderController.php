@@ -134,7 +134,7 @@ class OrderController extends Controller
         $payment = \App\Models\Payment::where('reference', $reference)->first();
         $order = $payment?->order;
 
-        // ✅ If order exists and verification successful, update order status to Processing
+        // If order exists and verification successful, update order status to Processing
         if ($order) {
             $order->update([
                 'status' => 'Processing',
@@ -185,7 +185,7 @@ public function updateStatus(Request $request, $orderId)
     // If status is 'completed' and payment method is COD
     if ($request->status === 'completed' && $order->payment_method === 'cod') {
         // Update related payment status
-        $payment = $order->payment; // Assumes you have $order->payment() relationship
+        $payment = $order->payment;
         if ($payment) {
             $payment->status = 'completed';
             $payment->save();
@@ -201,7 +201,7 @@ public function updateStatus(Request $request, $orderId)
     return response()->json([
         'success' => true,
         'message' => 'Order status updated successfully.',
-        'order' => $order->load('items', 'user', 'payment'), // preload if needed
+        'order' => $order->load('items', 'user', 'payment'), 
     ]);
 }
 

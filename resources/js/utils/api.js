@@ -146,7 +146,7 @@ export async function verifyPayment(reference) {
     console.log('✅ Payment verification response:', response);
     return response.data;
   } catch (error) {
-    console.error('❌ Error verifying payment:', error.response || error.message || error);
+    console.error('Error verifying payment:', error.response || error.message || error);
     throw error;
   }
 }

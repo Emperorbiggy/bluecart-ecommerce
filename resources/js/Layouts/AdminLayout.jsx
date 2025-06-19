@@ -44,7 +44,7 @@ export default function AdminLayout({ children }) {
       <AdminSidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-6 pt-20 md:p-8 md:pt-8">
           {children}
         </main>
       </div>

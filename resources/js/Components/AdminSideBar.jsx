@@ -1,4 +1,3 @@
-// AdminSidebar.jsx
 
 import { Link, usePage, router } from '@inertiajs/react'
 import {
