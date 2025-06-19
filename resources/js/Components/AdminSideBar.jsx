@@ -27,10 +27,18 @@ export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const { url } = usePage()
 
-  const handleLogout = () => {
-    router.post('/logout')
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      await axios.post('/api/logout', {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      localStorage.removeItem('auth_token')
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Logout failed', error)
+    }
   }
-
   return (
     <>
       {/* Mobile Top Bar */}
